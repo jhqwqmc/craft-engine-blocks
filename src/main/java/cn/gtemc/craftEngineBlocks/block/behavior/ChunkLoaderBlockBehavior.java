@@ -28,19 +28,12 @@ public class ChunkLoaderBlockBehavior extends BukkitBlockBehavior {
     }
 
     @Override
-    public void affectNeighborsAfterRemoval(Object thisBlock, Object[] args, Callable<Object> superMethod) {
-        Object serverLevel = args[1];
-        int blockX = FastNMS.INSTANCE.field$Vec3i$x(args[2]);
-        int blockZ = FastNMS.INSTANCE.field$Vec3i$z(args[2]);
+    public Object playerWillDestroy(Object thisBlock, Object[] args, Callable<Object> superMethod) throws Exception {
+        Object serverLevel = args[0];
+        int blockX = FastNMS.INSTANCE.field$Vec3i$x(args[1]);
+        int blockZ = FastNMS.INSTANCE.field$Vec3i$z(args[1]);
         updateChunkForced(serverLevel, blockX, blockZ, false);
-    }
-
-    @Override
-    public void onRemove(Object thisBlock, Object[] args, Callable<Object> superMethod) {
-        Object serverLevel = args[1];
-        int blockX = FastNMS.INSTANCE.field$Vec3i$x(args[2]);
-        int blockZ = FastNMS.INSTANCE.field$Vec3i$z(args[2]);
-        updateChunkForced(serverLevel, blockX, blockZ, false);
+        return super.playerWillDestroy(thisBlock, args, superMethod);
     }
 
     private static void updateChunkForced(Object serverLevel, int blockX, int blockZ, boolean add) {
