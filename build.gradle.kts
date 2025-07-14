@@ -42,7 +42,7 @@ tasks.processResources {
 }
 
 bukkit {
-    main = "cn.gtemc.craftEngineBlocks.CraftEngineBlocks"
+    main = "cn.gtemc.craftengine.CraftEngineBlocks"
     version = rootProject.properties["project_version"] as String
     name = "CraftEngineBlocks"
     apiVersion = "1.20"
@@ -60,6 +60,6 @@ tasks {
     shadowJar {
         archiveFileName = "${rootProject.name}-${rootProject.properties["project_version"]}.jar"
         destinationDirectory.set(file("$rootDir/target"))
-        relocate("net.bytebuddy", "cn.gtemc.libraries.bytebuddy")
+        relocate("net.bytebuddy", "cn.gtemc.craftengine.libraries.bytebuddy")
     }
 }
