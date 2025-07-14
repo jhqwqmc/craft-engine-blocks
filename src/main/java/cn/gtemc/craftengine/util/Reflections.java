@@ -86,28 +86,6 @@ public class Reflections {
             )
     );
 
-    public static final Class<?> clazz$BlockItem = requireNonNull(
-            BukkitReflectionUtils.findReobfOrMojmapClass(
-                    "world.item.ItemBlock",
-                    "world.item.BlockItem"
-            )
-    );
-
-    public static final Object instance$CollisionContext$empty;
-
-    static {
-        try {
-            instance$CollisionContext$empty = requireNonNull(CoreReflections.method$CollisionContext$empty.invoke(null));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    // 1.21.6+
-    public static final Method method$CollisionContext$placementContext = ReflectionUtils.getStaticMethod(
-            CoreReflections.clazz$CollisionContext, CoreReflections.clazz$CollisionContext, CoreReflections.clazz$Player
-    );
-
     public static final Method method$BlockItem$getBlock = requireNonNull(
             ReflectionUtils.getDeclaredMethod(
                     CoreReflections.clazz$BlockItem, CoreReflections.clazz$Block
