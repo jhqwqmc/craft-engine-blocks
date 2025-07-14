@@ -17,6 +17,7 @@ dependencies {
     compileOnly("net.momirealms:craft-engine-bukkit:${rootProject.properties["craftengine_version"]}")
     compileOnly("net.momirealms:craft-engine-nms-helper:${rootProject.properties["nms_helper_version"]}")
     compileOnly("it.unimi.dsi:fastutil:${rootProject.properties["fastutil_version"]}")
+    compileOnly("com.google.code.gson:gson:${rootProject.properties["gson_version"]}")
 }
 
 java {
@@ -31,6 +32,13 @@ tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
     options.release.set(21)
     dependsOn(tasks.clean)
+}
+
+tasks.processResources {
+    filteringCharset = "UTF-8"
+    filesMatching(arrayListOf("craft-engine-blocks.properties")) {
+        expand(rootProject.properties)
+    }
 }
 
 bukkit {
@@ -52,5 +60,6 @@ tasks {
     shadowJar {
         archiveFileName = "${rootProject.name}-${rootProject.properties["project_version"]}.jar"
         destinationDirectory.set(file("$rootDir/target"))
+        relocate("net.bytebuddy", "cn.gtemc.libraries.bytebuddy")
     }
 }
