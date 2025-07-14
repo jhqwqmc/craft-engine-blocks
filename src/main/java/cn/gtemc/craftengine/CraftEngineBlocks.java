@@ -6,6 +6,7 @@ import cn.gtemc.craftengine.classpath.impl.ReflectionClassPathAppender;
 import cn.gtemc.craftengine.dependency.Dependencies;
 import cn.gtemc.craftengine.dependency.DependencyManager;
 import cn.gtemc.craftengine.dependency.DependencyManagerImpl;
+import cn.gtemc.craftengine.injector.PlaceBlockBlockPlaceContextGenerator;
 import cn.gtemc.craftengine.scheduler.JavaScheduler;
 import cn.gtemc.craftengine.util.Reflections;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -38,6 +39,7 @@ public final class CraftEngineBlocks extends JavaPlugin {
         this.classPathAppender = new ReflectionClassPathAppender(this.getClass().getClassLoader());
         initDependencyManager();
         Reflections.init();
+        PlaceBlockBlockPlaceContextGenerator.init();
         BlockBehaviors.register();
     }
 

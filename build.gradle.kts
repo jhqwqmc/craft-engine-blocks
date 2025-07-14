@@ -18,6 +18,7 @@ dependencies {
     compileOnly("net.momirealms:craft-engine-nms-helper:${rootProject.properties["nms_helper_version"]}")
     compileOnly("it.unimi.dsi:fastutil:${rootProject.properties["fastutil_version"]}")
     compileOnly("com.google.code.gson:gson:${rootProject.properties["gson_version"]}")
+    compileOnly("net.bytebuddy:byte-buddy:${rootProject.properties["byte_buddy_version"]}")
 }
 
 java {
