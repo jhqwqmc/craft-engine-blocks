@@ -29,7 +29,6 @@ import net.momirealms.craftengine.core.item.behavior.ItemBehavior;
 import net.momirealms.craftengine.core.util.Direction;
 import net.momirealms.craftengine.core.util.Key;
 import net.momirealms.craftengine.core.util.MiscUtils;
-import net.momirealms.craftengine.core.util.ResourceConfigUtils;
 import net.momirealms.craftengine.core.world.BlockHitResult;
 import net.momirealms.craftengine.core.world.BlockPos;
 import org.bukkit.inventory.ItemStack;
@@ -264,8 +263,14 @@ public class PlaceBlockBehavior extends FacingTriggerableBlockBehavior {
         @Override
         @SuppressWarnings({"unchecked", "all"})
         public BlockBehavior create(CustomBlock block, Map<String, Object> arguments) {
-            Property<Direction> facing = (Property<Direction>) ResourceConfigUtils.requireNonNullOrThrow(block.getProperty("facing"), "warning.config.block.behavior.place_block.missing_facing");
-            Property<Boolean> triggered = (Property<Boolean>) ResourceConfigUtils.requireNonNullOrThrow(block.getProperty("triggered"), "warning.config.block.behavior.place_block.missing_triggered");
+            Property<Direction> facing = (Property<Direction>) block.getProperty("facing");
+            if (facing == null) {
+                throw new IllegalArgumentException("方块 '" + block.id() + "' 的 'gtemc:place_block' 行为缺少必需的 'facing' 属性");
+            }
+            Property<Boolean> triggered = (Property<Boolean>) block.getProperty("triggered");
+            if (triggered == null) {
+                throw new IllegalArgumentException("方块 '" + block.id() + "' 的 'gtemc:place_block' 行为缺少必需的 'triggered' 属性");
+            }
             boolean whitelistMode = (boolean) arguments.getOrDefault("whitelist", false);
             Set<Key> blocks = MiscUtils.getAsStringList(arguments.get("blocks")).stream().map(Key::of).collect(Collectors.toCollection(ObjectOpenHashSet::new));
             if (blocks.isEmpty() && !whitelistMode) {
