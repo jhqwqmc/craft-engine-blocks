@@ -7,6 +7,7 @@ import cn.gtemc.craftengine.dependency.Dependencies;
 import cn.gtemc.craftengine.dependency.DependencyManager;
 import cn.gtemc.craftengine.dependency.DependencyManagerImpl;
 import cn.gtemc.craftengine.scheduler.JavaScheduler;
+import cn.gtemc.craftengine.util.Reflections;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Set;
@@ -36,6 +37,7 @@ public final class CraftEngineBlocks extends JavaPlugin {
         this.scheduler = new JavaScheduler(this);
         this.classPathAppender = new ReflectionClassPathAppender(this.getClass().getClassLoader());
         initDependencyManager();
+        Reflections.init();
         BlockBehaviors.register();
     }
 
