@@ -14,6 +14,7 @@ import net.momirealms.craftengine.bukkit.plugin.reflection.minecraft.CoreReflect
 import net.momirealms.craftengine.core.util.ReflectionUtils;
 
 import java.lang.invoke.MethodHandle;
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.Objects;
@@ -81,25 +82,32 @@ public class PlaceBlockBlockPlaceContextGenerator {
 
     public static class DirectionsHandler {
         public static final DirectionsHandler INSTANCE = new DirectionsHandler();
+        private static final Object[] ONLY_EAST_Directions;
+
+        static {
+            ONLY_EAST_Directions = (Object[]) Array.newInstance(CoreReflections.clazz$Direction, 1);
+            Array.set(ONLY_EAST_Directions, 0, CoreReflections.instance$Direction$EAST);
+            CoreReflections.clazz$Direction.arrayType().cast(ONLY_EAST_Directions);
+        }
 
         @RuntimeType
         public Object[] getNearestLookingDirections(@This Object context) {
             try {
                 Object hitResult = Reflections.method$UseOnContext$getHitResult.invoke(context);
                 Object direction = Reflections.method$BlockHitResult$getDirection.invoke(hitResult);
-                Object[] directions = Arrays.copyOf(CoreReflections.instance$Directions, CoreReflections.instance$Directions.length);
-                directions[0] = direction;
-                directions[directions.length - 1] = FastNMS.INSTANCE.method$Direction$getOpposite(direction);
+                Object directions = Array.newInstance(CoreReflections.clazz$Direction, CoreReflections.instance$Directions.length);
+                Array.set(directions, 0, CoreReflections.clazz$Direction.cast(direction));
+                Array.set(directions, CoreReflections.instance$Directions.length - 1, CoreReflections.clazz$Direction.cast(FastNMS.INSTANCE.method$Direction$getOpposite(direction)));
                 int i = 0;
                 for (Object direction1 : CoreReflections.instance$Directions) {
                     if (direction1 != direction && direction1 != FastNMS.INSTANCE.method$Direction$getOpposite(direction)) {
-                        directions[++i] = CoreReflections.clazz$Direction.cast(direction);
+                        Array.set(directions, ++i, CoreReflections.clazz$Direction.cast(direction));
                     }
                 }
                 return (Object[]) CoreReflections.clazz$Direction.arrayType().cast(directions);
             } catch (Throwable e) {
                 CraftEngineBlocks.instance().getLogger().log(Level.WARNING, "Failed to run getNearestLookingDirections", e);
-                return new Object[]{CoreReflections.instance$Direction$EAST};
+                return ONLY_EAST_Directions;
             }
         }
     }
