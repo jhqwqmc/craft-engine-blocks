@@ -62,7 +62,7 @@ public class SeatBlockBehavior extends BukkitBlockBehavior implements EntityBloc
     }
 
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> createBlockEntityTicker(CEWorld level, ImmutableBlockState state, BlockEntityType<T> blockEntityType) {
+    public <T extends BlockEntity> BlockEntityTicker<T> createSyncBlockEntityTicker(CEWorld level, ImmutableBlockState state, BlockEntityType<T> blockEntityType) {
         return EntityBlockBehavior.createTickerHelper(SeatBlockEntity::tick);
     }
 
