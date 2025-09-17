@@ -16,7 +16,6 @@ import net.momirealms.craftengine.core.util.ReflectionUtils;
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.logging.Level;
 
@@ -95,11 +94,11 @@ public class PlaceBlockBlockPlaceContextGenerator {
             try {
                 Object hitResult = Reflections.method$UseOnContext$getHitResult.invoke(context);
                 Object direction = Reflections.method$BlockHitResult$getDirection.invoke(hitResult);
-                Object directions = Array.newInstance(CoreReflections.clazz$Direction, CoreReflections.instance$Directions.length);
+                Object directions = Array.newInstance(CoreReflections.clazz$Direction, CoreReflections.instance$Direction$values.length);
                 Array.set(directions, 0, CoreReflections.clazz$Direction.cast(direction));
-                Array.set(directions, CoreReflections.instance$Directions.length - 1, CoreReflections.clazz$Direction.cast(FastNMS.INSTANCE.method$Direction$getOpposite(direction)));
+                Array.set(directions, CoreReflections.instance$Direction$values.length - 1, CoreReflections.clazz$Direction.cast(FastNMS.INSTANCE.method$Direction$getOpposite(direction)));
                 int i = 0;
-                for (Object direction1 : CoreReflections.instance$Directions) {
+                for (Object direction1 : CoreReflections.instance$Direction$values) {
                     if (direction1 != direction && direction1 != FastNMS.INSTANCE.method$Direction$getOpposite(direction)) {
                         Array.set(directions, ++i, CoreReflections.clazz$Direction.cast(direction));
                     }

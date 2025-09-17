@@ -1,6 +1,6 @@
 plugins {
     id("java")
-    id("com.gradleup.shadow") version "9.0.0-rc1"
+    id("com.gradleup.shadow") version "9.0.0-rc2"
     id("de.eldoria.plugin-yml.bukkit") version "0.7.1"
 }
 
@@ -12,6 +12,7 @@ repositories {
 }
 
 dependencies {
+    implementation(project(":legacy"))
     compileOnly("io.papermc.paper:paper-api:${rootProject.properties["paper_version"]}-R0.1-SNAPSHOT")
     compileOnly("net.momirealms:craft-engine-core:${rootProject.properties["craftengine_version"]}")
     compileOnly("net.momirealms:craft-engine-bukkit:${rootProject.properties["craftengine_version"]}")

@@ -45,7 +45,7 @@ public class AdjustableRedstoneBlockBehavior extends BukkitBlockBehavior {
         FastNMS.INSTANCE.method$LevelWriter$setBlock(
                 context.getLevel().serverWorld(),
                 LocationUtils.toBlockPos(context.getClickedPos()),
-                state.with(this.powerProperty, power).customBlockState().handle(),
+                state.with(this.powerProperty, power).customBlockState().literalObject(),
                 UpdateOption.UPDATE_ALL.flags()
         );
         return InteractionResult.SUCCESS_AND_CANCEL;

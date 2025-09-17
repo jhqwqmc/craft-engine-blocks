@@ -77,9 +77,9 @@ public abstract class FacingTriggerableBlockBehavior extends BukkitBlockBehavior
                 z = FastNMS.INSTANCE.field$Vec3i$z(pos) >> 4;
             }
             CraftEngineBlocks.instance().scheduler().sync().runLater(() -> tick(state, level, pos), 1, world, x, z);
-            FastNMS.INSTANCE.method$LevelWriter$setBlock(level, pos, blockState.with(this.triggeredProperty, true).customBlockState().handle(), 2);
+            FastNMS.INSTANCE.method$LevelWriter$setBlock(level, pos, blockState.with(this.triggeredProperty, true).customBlockState().literalObject(), 2);
         } else if (!hasNeighborSignal && triggeredValue) {
-            FastNMS.INSTANCE.method$LevelWriter$setBlock(level, pos, blockState.with(this.triggeredProperty, false).customBlockState().handle(), 2);
+            FastNMS.INSTANCE.method$LevelWriter$setBlock(level, pos, blockState.with(this.triggeredProperty, false).customBlockState().literalObject(), 2);
         }
     }
 
