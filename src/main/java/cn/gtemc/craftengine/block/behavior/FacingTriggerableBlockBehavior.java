@@ -67,17 +67,9 @@ public abstract class FacingTriggerableBlockBehavior extends BukkitBlockBehavior
         if (blockState == null || blockState.isEmpty()) return;
         boolean triggeredValue = blockState.get(this.triggeredProperty);
         if (hasNeighborSignal && !triggeredValue) {
-            // FastNMS.INSTANCE.method$ScheduledTickAccess$scheduleBlockTick(level, pos, thisBlock, 1, this.getTickPriority()); // 鬼知道为什么这个无法触发 tick
-            World world = null;
-            int x = 0;
-            int z = 0;
-            if (VersionHelper.isFolia()) {
-                world = FastNMS.INSTANCE.method$Level$getCraftWorld(level);
-                x = FastNMS.INSTANCE.field$Vec3i$x(pos) >> 4;
-                z = FastNMS.INSTANCE.field$Vec3i$z(pos) >> 4;
-            }
-            CraftEngineBlocks.instance().scheduler().sync().runLater(() -> tick(state, level, pos), 1, world, x, z);
-            FastNMS.INSTANCE.method$LevelWriter$setBlock(level, pos, blockState.with(this.triggeredProperty, true).customBlockState().literalObject(), 2);
+            Object tickState = blockState.with(this.triggeredProperty, true).customBlockState().literalObject();
+            FastNMS.INSTANCE.method$LevelWriter$setBlock(level, pos, tickState, 2);
+            FastNMS.INSTANCE.method$ScheduledTickAccess$scheduleBlockTick(level, pos, BlockStateUtils.getBlockOwner(tickState), 1, this.getTickPriority());
         } else if (!hasNeighborSignal && triggeredValue) {
             FastNMS.INSTANCE.method$LevelWriter$setBlock(level, pos, blockState.with(this.triggeredProperty, false).customBlockState().literalObject(), 2);
         }
