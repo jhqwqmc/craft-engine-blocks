@@ -6,6 +6,7 @@ import cn.gtemc.craftengine.classpath.impl.ReflectionClassPathAppender;
 import cn.gtemc.craftengine.dependency.Dependencies;
 import cn.gtemc.craftengine.dependency.DependencyManager;
 import cn.gtemc.craftengine.dependency.DependencyManagerImpl;
+import cn.gtemc.craftengine.entity.seat.SeatManager;
 import cn.gtemc.craftengine.injector.PlaceBlockBlockPlaceContextGenerator;
 import cn.gtemc.craftengine.plugin.context.event.EventFunctions;
 import cn.gtemc.craftengine.scheduler.JavaScheduler;
@@ -19,20 +20,28 @@ public final class CraftEngineBlocks extends JavaPlugin {
     private JavaScheduler scheduler;
     private ClassPathAppender classPathAppender;
     private DependencyManager dependencyManager;
+    private SeatManager seatManager;
 
     @Override
     public void onLoad() {
         instance = this;
         initPlugin();
-        getLogger().info("CraftEngine Blocks Extensions Loaded");
+    }
+
+    @Override
+    public void onEnable() {
+        this.seatManager = new SeatManager(this);
+        this.scheduler.sync().runDelayed(() -> {
+            this.seatManager.delayedInit();
+        });
     }
 
     @Override
     public void onDisable() {
-        this.scheduler.shutdownScheduler();
-        this.scheduler.shutdownExecutor();
-        this.dependencyManager.close();
-        getLogger().info("CraftEngine Blocks Extensions Disabled");
+        if (this.seatManager != null) this.seatManager.disable();
+        if (this.scheduler != null) this.scheduler.shutdownScheduler();
+        if (this.scheduler != null) this.scheduler.shutdownExecutor();
+        if (this.dependencyManager != null) this.dependencyManager.close();
     }
 
     private void initPlugin() {

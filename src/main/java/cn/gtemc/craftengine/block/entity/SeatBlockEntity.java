@@ -1,97 +1,74 @@
 package cn.gtemc.craftengine.block.entity;
 
 import cn.gtemc.craftengine.util.LegacyAttributeUtils;
-import com.google.common.collect.ImmutableList;
-import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
-import net.momirealms.craftengine.bukkit.plugin.BukkitCraftEngine;
 import net.momirealms.craftengine.bukkit.util.EntityUtils;
 import net.momirealms.craftengine.core.block.ImmutableBlockState;
 import net.momirealms.craftengine.core.block.entity.BlockEntity;
+import net.momirealms.craftengine.core.block.properties.IntegerProperty;
 import net.momirealms.craftengine.core.block.properties.Property;
 import net.momirealms.craftengine.core.util.HorizontalDirection;
 import net.momirealms.craftengine.core.util.QuaternionUtils;
 import net.momirealms.craftengine.core.util.VersionHelper;
 import net.momirealms.craftengine.core.world.BlockPos;
-import net.momirealms.craftengine.core.world.CEWorld;
 import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
+import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
-import java.util.Map;
+import java.lang.ref.WeakReference;
 import java.util.Objects;
 
 public class SeatBlockEntity extends BlockEntity {
-    private final Map<Entity, Player> seatEntities = new Reference2ObjectArrayMap<>(1);
+    public static final NamespacedKey SEAT_KEY = new NamespacedKey("gtemc", "seat");
+    @Nullable
+    private WeakReference<Entity> seatEntity;
+    private final Vector3f offset;
+    private final float yaw;
+    private final boolean limitPlayerRotation;
 
-    public SeatBlockEntity(BlockPos pos, ImmutableBlockState blockState) {
+    public SeatBlockEntity(BlockPos pos, ImmutableBlockState blockState, Vector3f offset, float yaw, boolean limitPlayerRotation) {
         super(BlockEntityTypes.SEAT, pos, blockState);
-    }
-
-    public Map<Entity, Player> seatEntities() {
-        return this.seatEntities;
-    }
-
-    @SuppressWarnings("DuplicatedCode")
-    public static void tick(CEWorld world, BlockPos pos, ImmutableBlockState state, SeatBlockEntity seat) {
-        int size = seat.seatEntities.size();
-        if (size == 0) return;
-        if (size == 1) {
-            // 99.9999%的情况下会命中这里
-            Map.Entry<Entity, Player> entry = seat.seatEntities.entrySet().iterator().next();
-            Entity entity = entry.getKey();
-            Player player = entry.getValue();
-            if (VersionHelper.isFolia()) {
-                entity.getScheduler().run(BukkitCraftEngine.instance().javaPlugin(), t -> {
-                    if (entity.getPassengers().isEmpty()) {
-                        seat.tryLeavingSeat(player, entity);
-                        seat.seatEntities.remove(entity);
-                    }
-                }, null);
-            } else {
-                if (entity.getPassengers().isEmpty()) {
-                    seat.tryLeavingSeat(player, entity);
-                    seat.seatEntities.remove(entity);
-                }
-            }
-            return;
-        }
-        for (Map.Entry<Entity, Player> entry : ImmutableList.copyOf(seat.seatEntities.entrySet())) {
-            // 几乎不可能命中这里，除非写出bug了
-            Entity entity = entry.getKey();
-            Player player = entry.getValue();
-            if (VersionHelper.isFolia()) {
-                entity.getScheduler().run(BukkitCraftEngine.instance().javaPlugin(), t -> {
-                    if (entity.getPassengers().isEmpty()) {
-                        seat.tryLeavingSeat(player, entity);
-                        seat.seatEntities.remove(entity);
-                    }
-                }, null);
-            } else {
-                if (entity.getPassengers().isEmpty()) {
-                    seat.tryLeavingSeat(player, entity);
-                    seat.seatEntities.remove(entity);
-                }
-            }
-        }
+        this.offset = offset;
+        this.yaw = yaw;
+        this.limitPlayerRotation = limitPlayerRotation;
     }
 
     @Override
     public void preRemove() {
-        if (this.seatEntities.isEmpty()) return;
-        try {
-            this.seatEntities.keySet().forEach(Entity::remove);
-        } finally {
-            this.seatEntities.clear();
+        Entity entity = seatEntity();
+        if (entity != null) entity.remove();
+    }
+
+    public void seat(@NotNull Player player) {
+        if (isOccupied()) return;
+        this.spawnSeat(player);
+    }
+
+    @Nullable
+    private Entity seatEntity() {
+        return this.seatEntity == null ? null : this.seatEntity.get();
+    }
+
+    private boolean isOccupied() {
+        Entity entity = seatEntity();
+        return entity != null && entity.isValid() && !entity.getPassengers().isEmpty();
+    }
+
+    public void destroy() {
+        Entity entity = seatEntity();
+        if (entity != null) {
+            entity.remove();
+            this.seatEntity = null;
         }
     }
 
-    public void spawnSeatEntityForPlayer(@NotNull Player player, @NotNull Vector3f offset, float yaw, boolean limitPlayerRotation) {
-        if (!this.seatEntities.isEmpty() || !this.isValid()) return;
-        Location location = calculateSeatLocation(player, this.pos, this.blockState, offset, yaw);
+    private void spawnSeat(Player player) {
+        destroy();
+        Location location = calculateSeatLocation(new Location(player.getWorld(), super.pos.x() + 0.5, super.pos.y(), super.pos.z() + 0.5, 0, 180 - this.yaw));
         Entity seatEntity = limitPlayerRotation ?
                 EntityUtils.spawnEntity(player.getWorld(),
                         VersionHelper.isOrAbove1_20_2() ? location.subtract(0, 0.9875, 0) : location.subtract(0, 0.990625, 0),
@@ -112,6 +89,7 @@ public class SeatBlockEntity extends BlockEntity {
                             armorStand.setAI(false);
                             armorStand.setGravity(false);
                             armorStand.setPersistent(false);
+                            armorStand.getPersistentDataContainer().set(SEAT_KEY, PersistentDataType.BOOLEAN, true);
                         }) :
                 EntityUtils.spawnEntity(player.getWorld(),
                         VersionHelper.isOrAbove1_20_2() ? location : location.subtract(0, 0.25, 0),
@@ -119,94 +97,49 @@ public class SeatBlockEntity extends BlockEntity {
                         entity -> {
                             ItemDisplay itemDisplay = (ItemDisplay) entity;
                             itemDisplay.setPersistent(false);
+                            itemDisplay.getPersistentDataContainer().set(SEAT_KEY, PersistentDataType.BOOLEAN, true);
                         });
         if (!seatEntity.addPassenger(player)) {
             seatEntity.remove();
-            return;
+        } else {
+            this.seatEntity = new WeakReference<>(seatEntity);
         }
-        this.seatEntities.put(seatEntity, player);
     }
 
-    private Location calculateSeatLocation(Player player, BlockPos pos, ImmutableBlockState state, Vector3f offset, float yaw) {
-        Location location = new Location(player.getWorld(), pos.x() + 0.5, pos.y() + 0.5, pos.z() + 0.5);
-        for (Property<?> property : state.getProperties()) {
+    private Location calculateSeatLocation(Location sourceLocation) {
+        for (Property<?> property : super.blockState.getProperties()) {
             if (property.name().equals("facing") && property.valueClass() == HorizontalDirection.class) {
-                switch ((HorizontalDirection) state.get(property)) {
-                    case NORTH -> location.setYaw(0);
-                    case SOUTH -> location.setYaw(180);
-                    case WEST -> location.setYaw(270);
-                    case EAST -> location.setYaw(90);
+                switch ((HorizontalDirection) super.blockState.get(property)) {
+                    case NORTH -> sourceLocation.setYaw(0);
+                    case SOUTH -> sourceLocation.setYaw(180);
+                    case WEST -> sourceLocation.setYaw(270);
+                    case EAST -> sourceLocation.setYaw(90);
                 }
                 break;
             }
             if (property.name().equals("facing_clockwise") && property.valueClass() == HorizontalDirection.class) {
-                switch ((HorizontalDirection) state.get(property)) {
-                    case NORTH -> location.setYaw(90);
-                    case SOUTH -> location.setYaw(270);
-                    case WEST -> location.setYaw(0);
-                    case EAST -> location.setYaw(180);
+                switch ((HorizontalDirection) super.blockState.get(property)) {
+                    case NORTH -> sourceLocation.setYaw(90);
+                    case SOUTH -> sourceLocation.setYaw(270);
+                    case WEST -> sourceLocation.setYaw(0);
+                    case EAST -> sourceLocation.setYaw(180);
                 }
                 break;
             }
-        }
-        Vector3f newOffset = QuaternionUtils.toQuaternionf(0, Math.toRadians(180 - location.getYaw()), 0)
-                .conjugate()
-                .transform(new Vector3f(offset));
-        double newYaw = yaw + location.getYaw();
-        if (newYaw < -180) newYaw += 360;
-        Location newLocation = location.clone();
-        newLocation.setYaw((float) newYaw);
-        newLocation.add(newOffset.x, newOffset.y + 0.6, -newOffset.z);
-        return newLocation;
-    }
-
-    private void tryLeavingSeat(@NotNull Player player, @NotNull Entity vehicle) {
-        vehicle.remove();
-        if (player.getVehicle() != null) return;
-        Location vehicleLocation = vehicle.getLocation();
-        Location originalLocation = vehicleLocation.clone();
-        originalLocation.setY(this.pos.y());
-        Location targetLocation = originalLocation.clone().add(vehicleLocation.getDirection().multiply(1.1));
-        if (!isSafeLocation(targetLocation)) {
-            targetLocation = findSafeLocationNearby(originalLocation);
-            if (targetLocation == null) return;
-        }
-        targetLocation.setYaw(player.getLocation().getYaw());
-        targetLocation.setPitch(player.getLocation().getPitch());
-        if (VersionHelper.isFolia()) {
-            player.teleportAsync(targetLocation);
-        } else {
-            player.teleport(targetLocation);
-        }
-    }
-
-    private boolean isSafeLocation(Location location) {
-        World world = location.getWorld();
-        if (world == null) return false;
-        int x = location.getBlockX();
-        int y = location.getBlockY();
-        int z = location.getBlockZ();
-        if (!world.getBlockAt(x, y - 1, z).getType().isSolid()) return false;
-        if (!world.getBlockAt(x, y, z).isPassable()) return false;
-        return world.getBlockAt(x, y + 1, z).isPassable();
-    }
-
-    @Nullable
-    private Location findSafeLocationNearby(Location center) {
-        World world = center.getWorld();
-        if (world == null) return null;
-        int centerX = center.getBlockX();
-        int centerY = center.getBlockY();
-        int centerZ = center.getBlockZ();
-        for (int dx = -1; dx <= 1; dx++) {
-            for (int dz = -1; dz <= 1; dz++) {
-                if (dx == 0 && dz == 0) continue;
-                int x = centerX + dx;
-                int z = centerZ + dz;
-                Location nearbyLocation = new Location(world, x + 0.5, centerY, z + 0.5);
-                if (isSafeLocation(nearbyLocation)) return nearbyLocation;
+            if (property.name().equals("rotation") && property.valueClass() == Integer.class) {
+                IntegerProperty rotation = (IntegerProperty) property;
+                int min = rotation.min;
+                int max = rotation.max;
+                int current = (Integer) super.blockState.get(property);
+                sourceLocation.setYaw((float) ((current - min) * 360) / (max - min));
             }
         }
-        return null;
+        Vector3f offset = QuaternionUtils.toQuaternionf(0, Math.toRadians(180 - sourceLocation.getYaw()), 0).conjugate().transform(new Vector3f(this.offset));
+        double yaw = this.yaw + sourceLocation.getYaw();
+        if (yaw < -180) yaw += 360;
+        Location newLocation = sourceLocation.clone();
+        newLocation.setYaw((float) yaw);
+        newLocation.add(offset.x, offset.y + 0.6, -offset.z);
+        return newLocation;
     }
 }

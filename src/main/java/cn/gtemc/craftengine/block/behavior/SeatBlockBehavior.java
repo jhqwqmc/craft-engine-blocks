@@ -11,12 +11,12 @@ import net.momirealms.craftengine.core.block.behavior.BlockBehaviorFactory;
 import net.momirealms.craftengine.core.block.behavior.EntityBlockBehavior;
 import net.momirealms.craftengine.core.block.entity.BlockEntity;
 import net.momirealms.craftengine.core.block.entity.BlockEntityType;
-import net.momirealms.craftengine.core.block.entity.tick.BlockEntityTicker;
 import net.momirealms.craftengine.core.entity.player.InteractionResult;
 import net.momirealms.craftengine.core.item.context.UseOnContext;
 import net.momirealms.craftengine.core.util.ResourceConfigUtils;
 import net.momirealms.craftengine.core.world.BlockPos;
 import net.momirealms.craftengine.core.world.CEWorld;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.util.Map;
@@ -44,26 +44,21 @@ public class SeatBlockBehavior extends BukkitBlockBehavior implements EntityBloc
         player.swingHand(context.getHand());
         CEWorld world = context.getLevel().storageWorld();
         BlockEntity blockEntity = world.getBlockEntityAtIfLoaded(context.getClickedPos());
-        if (!(blockEntity instanceof SeatBlockEntity seatBlockEntity) || !seatBlockEntity.seatEntities().isEmpty()) {
+        if (!(blockEntity instanceof SeatBlockEntity seatBlockEntity)) {
             return InteractionResult.PASS;
         }
-        seatBlockEntity.spawnSeatEntityForPlayer(player.platformPlayer(), this.offset, this.yaw, this.limitPlayerRotation);
+        seatBlockEntity.seat(player.platformPlayer());
         return InteractionResult.SUCCESS_AND_CANCEL;
     }
 
     @Override
-    public <T extends BlockEntity> BlockEntityType<T> blockEntityType() {
+    public @Nullable <T extends BlockEntity> BlockEntityType<T> blockEntityType(ImmutableBlockState immutableBlockState) {
         return EntityBlockBehavior.blockEntityTypeHelper(BlockEntityTypes.SEAT);
     }
 
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, ImmutableBlockState state) {
-        return new SeatBlockEntity(pos, state);
-    }
-
-    @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> createSyncBlockEntityTicker(CEWorld level, ImmutableBlockState state, BlockEntityType<T> blockEntityType) {
-        return EntityBlockBehavior.createTickerHelper(SeatBlockEntity::tick);
+        return new SeatBlockEntity(pos, state, this.offset, this.yaw, this.limitPlayerRotation);
     }
 
     public static class Factory implements BlockBehaviorFactory {

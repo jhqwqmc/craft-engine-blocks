@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public class ApplyDataFunction<CTX extends Context> extends AbstractConditionalFunction<CTX> {
-    public static final FactoryImpl<PlayerOptionalContext> FACTORY = new FactoryImpl<>(EventConditions::fromMap);
+    public static final FactoryImpl<Context> FACTORY = new FactoryImpl<>(EventConditions::fromMap);
     private final ItemDataModifier<?>[] modifiers;
 
     public ApplyDataFunction(List<Condition<CTX>> predicates, ItemDataModifier<?>[] modifiers) {

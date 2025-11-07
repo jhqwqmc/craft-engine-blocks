@@ -25,7 +25,7 @@ import java.util.Optional;
 
 @SuppressWarnings({"unchecked", "rawtypes", "OptionalUsedAsFieldOrParameterType"})
 public class SetLoreFunction<CTX extends Context> extends AbstractConditionalFunction<CTX> {
-    public static final FactoryImpl<PlayerOptionalContext> FACTORY = new FactoryImpl<>(EventConditions::fromMap);
+    public static final FactoryImpl<Context> FACTORY = new FactoryImpl<>(EventConditions::fromMap);
     private final PlayerSelector<CTX> selector;
     private final Optional<InteractionHand> hand;
     private final ItemDataModifier<?> loreModifier;

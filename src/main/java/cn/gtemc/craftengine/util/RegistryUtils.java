@@ -3,7 +3,7 @@ package cn.gtemc.craftengine.util;
 import net.momirealms.craftengine.core.block.behavior.BlockBehaviorFactory;
 import net.momirealms.craftengine.core.block.entity.BlockEntity;
 import net.momirealms.craftengine.core.block.entity.BlockEntityType;
-import net.momirealms.craftengine.core.plugin.context.PlayerOptionalContext;
+import net.momirealms.craftengine.core.plugin.context.Context;
 import net.momirealms.craftengine.core.plugin.context.function.FunctionFactory;
 import net.momirealms.craftengine.core.registry.BuiltInRegistries;
 import net.momirealms.craftengine.core.registry.Registries;
@@ -18,15 +18,15 @@ public class RegistryUtils {
                 .register(ResourceKey.create(Registries.BLOCK_BEHAVIOR_FACTORY.location(), key), factory);
     }
 
-    public static <T extends BlockEntity> BlockEntityType<T> registerBlockEntity(Key id, BlockEntity.Factory<T> factory) {
-        BlockEntityType<T> type = new BlockEntityType<>(id, factory);
+    public static <T extends BlockEntity> BlockEntityType<T> registerBlockEntity(Key id) {
+        BlockEntityType<T> type = new BlockEntityType<>(id);
         ((WritableRegistry<BlockEntityType<?>>) BuiltInRegistries.BLOCK_ENTITY_TYPE)
                 .register(ResourceKey.create(Registries.BLOCK_ENTITY_TYPE.location(), id), type);
         return type;
     }
 
-    public static void registerEventFunction(Key key, FunctionFactory<PlayerOptionalContext> factory) {
-        ((WritableRegistry<FunctionFactory<PlayerOptionalContext>>) BuiltInRegistries.EVENT_FUNCTION_FACTORY)
+    public static void registerEventFunction(Key key, FunctionFactory<Context> factory) {
+        ((WritableRegistry<FunctionFactory<Context>>) BuiltInRegistries.EVENT_FUNCTION_FACTORY)
                 .register(ResourceKey.create(Registries.EVENT_FUNCTION_FACTORY.location(), key), factory);
     }
 }
