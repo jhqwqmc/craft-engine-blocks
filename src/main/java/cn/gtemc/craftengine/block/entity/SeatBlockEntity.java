@@ -68,7 +68,7 @@ public class SeatBlockEntity extends BlockEntity {
 
     private void spawnSeat(Player player) {
         destroy();
-        Location location = calculateSeatLocation(new Location(player.getWorld(), super.pos.x() + 0.5, super.pos.y(), super.pos.z() + 0.5, 0, 180 - this.yaw));
+        Location location = calculateSeatLocation(new Location(player.getWorld(), super.pos.x() + 0.5, super.pos.y(), super.pos.z() + 0.5, 0, 0));
         Entity seatEntity = limitPlayerRotation ?
                 EntityUtils.spawnEntity(player.getWorld(),
                         VersionHelper.isOrAbove1_20_2() ? location.subtract(0, 0.9875, 0) : location.subtract(0, 0.990625, 0),
