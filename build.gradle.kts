@@ -1,3 +1,5 @@
+import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
+
 plugins {
     id("java")
     id("com.gradleup.shadow") version "9.0.0-rc2"
@@ -48,6 +50,7 @@ bukkit {
     version = rootProject.properties["project_version"] as String
     name = "CraftEngineBlocks"
     apiVersion = "1.20"
+    load = BukkitPluginDescription.PluginLoadOrder.STARTUP
     author = "jhqwqmc"
     website = "https://github.com/jhqwqmc"
     depend = listOf("CraftEngine")
