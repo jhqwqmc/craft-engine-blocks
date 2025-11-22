@@ -47,7 +47,7 @@ public class PickaxeBlockBehavior extends FacingTriggerableBlockBehavior {
         Object breakPos = FastNMS.INSTANCE.method$BlockPos$relative(pos, DirectionUtils.toNMSDirection(blockState.get(this.facingProperty)));
         Object breakState = FastNMS.INSTANCE.method$BlockGetter$getBlockState(level, breakPos);
         if (blockCheckByBlockState(breakState)) {
-            FastNMS.INSTANCE.method$Level$destroyBlock(level, breakPos, true);
+            FastNMS.INSTANCE.method$LevelWriter$destroyBlock(level, breakPos, true);
         }
     }
 
