@@ -3,11 +3,11 @@ package cn.gtemc.craftengine.block.behavior;
 import net.momirealms.craftengine.bukkit.block.behavior.BukkitBlockBehavior;
 import net.momirealms.craftengine.bukkit.nms.FastNMS;
 import net.momirealms.craftengine.bukkit.plugin.reflection.minecraft.CoreReflections;
+import net.momirealms.craftengine.bukkit.util.LocationUtils;
 import net.momirealms.craftengine.core.block.BlockBehavior;
 import net.momirealms.craftengine.core.block.CustomBlock;
-import net.momirealms.craftengine.core.block.ImmutableBlockState;
 import net.momirealms.craftengine.core.block.behavior.BlockBehaviorFactory;
-import net.momirealms.craftengine.core.item.context.BlockPlaceContext;
+import net.momirealms.craftengine.core.world.BlockPos;
 
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -20,11 +20,12 @@ public class ChunkLoaderBlockBehavior extends BukkitBlockBehavior {
     }
 
     @Override
-    public void setPlacedBy(BlockPlaceContext context, ImmutableBlockState state) {
-        Object serverLevel = context.getLevel().serverWorld();
-        int blockX = context.getClickedPos().x();
-        int blockZ = context.getClickedPos().z();
-        updateChunkForced(serverLevel, blockX, blockZ, true);
+    public void placeMultiState(Object thisBlock, Object[] args, Callable<Object> superMethod) {
+        if (!CoreReflections.clazz$ServerLevel.isInstance(args[0])) return;
+        BlockPos pos = LocationUtils.fromBlockPos(args[1]);
+        int blockX = pos.x();
+        int blockZ = pos.z();
+        updateChunkForced(args[0], blockX, blockZ, true);
     }
 
     @Override

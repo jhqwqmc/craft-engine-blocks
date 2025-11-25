@@ -3,6 +3,8 @@ package cn.gtemc.craftengine.util;
 import net.momirealms.craftengine.core.block.behavior.BlockBehaviorFactory;
 import net.momirealms.craftengine.core.block.entity.BlockEntity;
 import net.momirealms.craftengine.core.block.entity.BlockEntityType;
+import net.momirealms.craftengine.core.item.ItemDataModifierFactory;
+import net.momirealms.craftengine.core.item.ItemSettings;
 import net.momirealms.craftengine.core.plugin.context.Context;
 import net.momirealms.craftengine.core.plugin.context.function.FunctionFactory;
 import net.momirealms.craftengine.core.registry.BuiltInRegistries;
@@ -28,5 +30,14 @@ public class RegistryUtils {
     public static void registerEventFunction(Key key, FunctionFactory<Context> factory) {
         ((WritableRegistry<FunctionFactory<Context>>) BuiltInRegistries.EVENT_FUNCTION_FACTORY)
                 .register(ResourceKey.create(Registries.EVENT_FUNCTION_FACTORY.location(), key), factory);
+    }
+
+    public static void registerItemSetting(Key key, ItemSettings.Modifier.Factory factory) {
+        ItemSettings.Modifiers.registerFactory(key.asString(), factory);
+    }
+
+    public static <T> void registerItemDataModifier(Key key, ItemDataModifierFactory<T> factory) {
+        ((WritableRegistry<ItemDataModifierFactory<?>>) BuiltInRegistries.ITEM_DATA_MODIFIER_FACTORY)
+                .register(ResourceKey.create(Registries.ITEM_DATA_MODIFIER_FACTORY.location(), key), factory);
     }
 }
