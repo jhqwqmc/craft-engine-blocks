@@ -34,8 +34,8 @@ public final class CraftEngineBlocks extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        this.seatManager = new SeatManager(this);
-        this.itemManager = new ItemManager(this);
+        this.seatManager.reload();
+        this.itemManager.reload();
         this.scheduler.sync().runDelayed(() -> {
             this.seatManager.delayedInit();
             this.itemManager.delayedInit();
@@ -61,6 +61,8 @@ public final class CraftEngineBlocks extends JavaPlugin {
         EventFunctions.register();
         ItemSettings.register();
         ItemDataModifiers.register();
+        this.seatManager = new SeatManager(this);
+        this.itemManager = new ItemManager(this);
     }
 
     private void initDependencyManager() {

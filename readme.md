@@ -11,3 +11,7 @@
 我从以下开源项目借鉴了一些代码
 - [CraftEngine](https://github.com/Xiao-MoMi/craft-engine)
 - [LuckPerms](https://github.com/LuckPerms/LuckPerms)
+
+## 示例配置
+
+[block_extension_demo.zip](demo/block_extension_demo.zip)
