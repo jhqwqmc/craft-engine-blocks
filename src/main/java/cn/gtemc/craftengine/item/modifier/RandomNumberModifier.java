@@ -1,14 +1,13 @@
 package cn.gtemc.craftengine.item.modifier;
 
-import cn.gtemc.craftengine.item.ItemDataModifiers;
 import cn.gtemc.craftengine.plugin.context.RandomNumberContext;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.momirealms.craftengine.bukkit.item.DataComponentTypes;
 import net.momirealms.craftengine.core.item.Item;
 import net.momirealms.craftengine.core.item.ItemBuildContext;
-import net.momirealms.craftengine.core.item.ItemDataModifierFactory;
-import net.momirealms.craftengine.core.item.modifier.ItemDataModifier;
-import net.momirealms.craftengine.core.item.modifier.SimpleNetworkItemDataModifier;
+import net.momirealms.craftengine.core.item.ItemProcessorFactory;
+import net.momirealms.craftengine.core.item.processor.ItemProcessor;
+import net.momirealms.craftengine.core.item.processor.SimpleNetworkItemProcessor;
 import net.momirealms.craftengine.core.plugin.context.number.NumberProvider;
 import net.momirealms.craftengine.core.plugin.context.number.NumberProviders;
 import net.momirealms.craftengine.core.util.Key;
@@ -17,17 +16,13 @@ import net.momirealms.craftengine.libraries.nbt.CompoundTag;
 
 import java.util.Map;
 
-public class RandomNumberModifier<I> implements SimpleNetworkItemDataModifier<I> {
-    public static final Factory<?> FACTORY = new Factory<>();
+public class RandomNumberModifier<I> implements SimpleNetworkItemProcessor<I> {
+    public static final Key ID = Key.of("gtemc:random_number");
+    public static final ItemProcessorFactory<?> FACTORY = new Factory<>();
     private final Map<String, NumberProvider> numberProviders;
 
     public RandomNumberModifier(Map<String, NumberProvider> numberProviders) {
         this.numberProviders = numberProviders;
-    }
-
-    @Override
-    public Key type() {
-        return ItemDataModifiers.RANDOM_NUMBER;
     }
 
     @Override
@@ -42,10 +37,10 @@ public class RandomNumberModifier<I> implements SimpleNetworkItemDataModifier<I>
         return item;
     }
 
-    public static class Factory<I> implements ItemDataModifierFactory<I> {
+    private static class Factory<I> implements ItemProcessorFactory<I> {
 
         @Override
-        public ItemDataModifier<I> create(Object arg) {
+        public ItemProcessor<I> create(Object arg) {
             Map<String, Object> data = ResourceConfigUtils.getAsMap(arg, "gtemc:random_number");
             Map<String, NumberProvider> numberProviders = new Object2ObjectOpenHashMap<>();
             for (Map.Entry<String, Object> entry : data.entrySet()) {

@@ -2,20 +2,17 @@ package cn.gtemc.craftengine.block;
 
 import cn.gtemc.craftengine.block.behavior.*;
 import cn.gtemc.craftengine.util.RegistryUtils;
-import net.momirealms.craftengine.core.util.Key;
+import net.momirealms.craftengine.core.block.behavior.BlockBehaviorType;
 
-public class BlockBehaviors {
-    public static final Key CHUNK_LOADER_BLOCK = Key.of("gtemc:chunk_loader_block");
-    public static final Key ADJUSTABLE_REDSTONE_BLOCK = Key.of("gtemc:adjustable_redstone_block");
-    public static final Key PICKAXE_BLOCK = Key.of("gtemc:pickaxe_block");
-    public static final Key PLACE_BLOCK = Key.of("gtemc:place_block");
-    public static final Key SEAT_BLOCK = Key.of("gtemc:seat_block");
+public final class BlockBehaviors {
+    private BlockBehaviors() {}
+
+    public static final BlockBehaviorType ChunkLoaderBlock = RegistryUtils.registerBlockBehavior(ChunkLoaderBlockBehavior.ID, ChunkLoaderBlockBehavior.FACTORY);
+    public static final BlockBehaviorType AdjustableRedstoneBlock = RegistryUtils.registerBlockBehavior(AdjustableRedstoneBlockBehavior.ID, AdjustableRedstoneBlockBehavior.FACTORY);
+    public static final BlockBehaviorType PickaxeBlock = RegistryUtils.registerBlockBehavior(PickaxeBlockBehavior.ID, PickaxeBlockBehavior.FACTORY);
+    public static final BlockBehaviorType PlaceBlock = RegistryUtils.registerBlockBehavior(PlaceBlockBehavior.ID, PlaceBlockBehavior.FACTORY);
+    public static final BlockBehaviorType SeatBlock = RegistryUtils.registerBlockBehavior(SeatBlockBehavior.ID, SeatBlockBehavior.FACTORY);
 
     public static void register() {
-        RegistryUtils.registerBlockBehavior(CHUNK_LOADER_BLOCK, ChunkLoaderBlockBehavior.FACTORY);
-        RegistryUtils.registerBlockBehavior(ADJUSTABLE_REDSTONE_BLOCK, AdjustableRedstoneBlockBehavior.FACTORY);
-        RegistryUtils.registerBlockBehavior(PICKAXE_BLOCK, PickaxeBlockBehavior.FACTORY);
-        RegistryUtils.registerBlockBehavior(PLACE_BLOCK, PlaceBlockBehavior.FACTORY);
-        RegistryUtils.registerBlockBehavior(SEAT_BLOCK, SeatBlockBehavior.FACTORY);
     }
 }

@@ -4,18 +4,19 @@ import cn.gtemc.craftengine.block.entity.BlockEntityTypes;
 import cn.gtemc.craftengine.block.entity.SeatBlockEntity;
 import net.momirealms.craftengine.bukkit.block.behavior.BukkitBlockBehavior;
 import net.momirealms.craftengine.bukkit.plugin.user.BukkitServerPlayer;
-import net.momirealms.craftengine.core.block.BlockBehavior;
 import net.momirealms.craftengine.core.block.CustomBlock;
 import net.momirealms.craftengine.core.block.ImmutableBlockState;
+import net.momirealms.craftengine.core.block.behavior.BlockBehavior;
 import net.momirealms.craftengine.core.block.behavior.BlockBehaviorFactory;
 import net.momirealms.craftengine.core.block.behavior.EntityBlockBehavior;
 import net.momirealms.craftengine.core.block.entity.BlockEntity;
 import net.momirealms.craftengine.core.block.entity.BlockEntityType;
 import net.momirealms.craftengine.core.entity.player.InteractionResult;
-import net.momirealms.craftengine.core.item.context.UseOnContext;
+import net.momirealms.craftengine.core.util.Key;
 import net.momirealms.craftengine.core.util.ResourceConfigUtils;
 import net.momirealms.craftengine.core.world.BlockPos;
 import net.momirealms.craftengine.core.world.CEWorld;
+import net.momirealms.craftengine.core.world.context.UseOnContext;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
@@ -23,7 +24,8 @@ import java.util.Map;
 
 @SuppressWarnings("UnstableApiUsage")
 public class SeatBlockBehavior extends BukkitBlockBehavior implements EntityBlockBehavior {
-    public static final Factory FACTORY = new Factory();
+    public static final Key ID = Key.of("gtemc:seat_block");
+    public static final BlockBehaviorFactory FACTORY = new Factory();
     private final Vector3f offset;
     private final float yaw;
     private final boolean limitPlayerRotation;
@@ -61,7 +63,7 @@ public class SeatBlockBehavior extends BukkitBlockBehavior implements EntityBloc
         return new SeatBlockEntity(pos, state, this.offset, this.yaw, this.limitPlayerRotation);
     }
 
-    public static class Factory implements BlockBehaviorFactory {
+    private static class Factory implements BlockBehaviorFactory {
 
         @Override
         public BlockBehavior create(CustomBlock block, Map<String, Object> arguments) {

@@ -1,6 +1,5 @@
 package cn.gtemc.craftengine.block.behavior;
 
-import cn.gtemc.craftengine.CraftEngineBlocks;
 import cn.gtemc.craftengine.item.context.PlaceBlockBlockPlaceContext;
 import cn.gtemc.craftengine.util.Reflections;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
@@ -14,11 +13,10 @@ import net.momirealms.craftengine.bukkit.util.KeyUtils;
 import net.momirealms.craftengine.core.block.CustomBlock;
 import net.momirealms.craftengine.core.block.ImmutableBlockState;
 import net.momirealms.craftengine.core.block.properties.Property;
-import net.momirealms.craftengine.core.item.context.BlockPlaceContext;
+import net.momirealms.craftengine.core.entity.player.Player;
 import net.momirealms.craftengine.core.util.Direction;
 import net.momirealms.craftengine.core.util.Key;
-import net.momirealms.craftengine.core.util.VersionHelper;
-import org.bukkit.World;
+import net.momirealms.craftengine.core.world.context.BlockPlaceContext;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
@@ -80,7 +78,11 @@ public abstract class FacingTriggerableBlockBehavior extends BukkitBlockBehavior
         if (context instanceof PlaceBlockBlockPlaceContext placeContext) {
             return state.owner().value().defaultState().with(this.facingProperty, placeContext.getNearestLookingDirection().opposite());
         }
-        Direction direction = DirectionUtils.fromNMSDirection(FastNMS.INSTANCE.method$Direction$getOpposite(orderedByNearest(context.getPlayer().serverPlayer())[0]));
+        Player player = context.getPlayer();
+        if (player == null) {
+            return null;
+        }
+        Direction direction = DirectionUtils.fromNMSDirection(FastNMS.INSTANCE.method$Direction$getOpposite(orderedByNearest(player.serverPlayer())[0]));
         return state.owner().value().defaultState().with(this.facingProperty, direction);
     }
 

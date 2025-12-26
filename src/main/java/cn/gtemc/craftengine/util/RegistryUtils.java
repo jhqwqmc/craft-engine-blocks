@@ -1,10 +1,12 @@
 package cn.gtemc.craftengine.util;
 
 import net.momirealms.craftengine.core.block.behavior.BlockBehaviorFactory;
+import net.momirealms.craftengine.core.block.behavior.BlockBehaviorType;
 import net.momirealms.craftengine.core.block.entity.BlockEntity;
 import net.momirealms.craftengine.core.block.entity.BlockEntityType;
-import net.momirealms.craftengine.core.item.ItemDataModifierFactory;
+import net.momirealms.craftengine.core.item.ItemProcessorFactory;
 import net.momirealms.craftengine.core.item.ItemSettings;
+import net.momirealms.craftengine.core.item.processor.ItemProcessorType;
 import net.momirealms.craftengine.core.plugin.context.Context;
 import net.momirealms.craftengine.core.plugin.context.function.FunctionFactory;
 import net.momirealms.craftengine.core.registry.BuiltInRegistries;
@@ -15,9 +17,11 @@ import net.momirealms.craftengine.core.util.ResourceKey;
 
 public class RegistryUtils {
 
-    public static void registerBlockBehavior(Key key, BlockBehaviorFactory factory) {
-        ((WritableRegistry<BlockBehaviorFactory>) BuiltInRegistries.BLOCK_BEHAVIOR_FACTORY)
-                .register(ResourceKey.create(Registries.BLOCK_BEHAVIOR_FACTORY.location(), key), factory);
+    public static BlockBehaviorType registerBlockBehavior(Key key, BlockBehaviorFactory factory) {
+        BlockBehaviorType type = new BlockBehaviorType(key, factory);
+        ((WritableRegistry<BlockBehaviorType>) BuiltInRegistries.BLOCK_BEHAVIOR_TYPE)
+                .register(ResourceKey.create(Registries.BLOCK_BEHAVIOR_TYPE.location(), key), type);
+        return type;
     }
 
     public static <T extends BlockEntity> BlockEntityType<T> registerBlockEntity(Key id) {
@@ -36,8 +40,10 @@ public class RegistryUtils {
         ItemSettings.Modifiers.registerFactory(key.asString(), factory);
     }
 
-    public static <T> void registerItemDataModifier(Key key, ItemDataModifierFactory<T> factory) {
-        ((WritableRegistry<ItemDataModifierFactory<?>>) BuiltInRegistries.ITEM_DATA_MODIFIER_FACTORY)
-                .register(ResourceKey.create(Registries.ITEM_DATA_MODIFIER_FACTORY.location(), key), factory);
+    public static <T> ItemProcessorType<T> registerItemProcessorType(Key key, ItemProcessorFactory<T> factory) {
+        ItemProcessorType<T> type = new ItemProcessorType<>(key, factory);
+        ((WritableRegistry<ItemProcessorType<?>>) BuiltInRegistries.ITEM_PROCESSOR_TYPE)
+                .register(ResourceKey.create(Registries.ITEM_PROCESSOR_TYPE.location(), key), type);
+        return type;
     }
 }

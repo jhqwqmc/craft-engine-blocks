@@ -1,6 +1,5 @@
 package cn.gtemc.craftengine.item.modifier;
 
-import cn.gtemc.craftengine.item.ItemDataModifiers;
 import cn.gtemc.craftengine.item.settings.AttributesSetting;
 import cn.gtemc.craftengine.plugin.context.RandomNumberContext;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -9,9 +8,9 @@ import net.momirealms.craftengine.core.attribute.AttributeModifier;
 import net.momirealms.craftengine.core.item.CustomItem;
 import net.momirealms.craftengine.core.item.Item;
 import net.momirealms.craftengine.core.item.ItemBuildContext;
-import net.momirealms.craftengine.core.item.ItemDataModifierFactory;
-import net.momirealms.craftengine.core.item.modifier.ItemDataModifier;
-import net.momirealms.craftengine.core.item.modifier.SimpleNetworkItemDataModifier;
+import net.momirealms.craftengine.core.item.ItemProcessorFactory;
+import net.momirealms.craftengine.core.item.processor.ItemProcessor;
+import net.momirealms.craftengine.core.item.processor.SimpleNetworkItemProcessor;
 import net.momirealms.craftengine.core.plugin.context.ContextKey;
 import net.momirealms.craftengine.core.util.Key;
 import net.momirealms.craftengine.core.util.ResourceConfigUtils;
@@ -23,17 +22,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public class GetArgumentsModifier<I> implements SimpleNetworkItemDataModifier<I> {
-    public static final Factory<?> FACTORY = new Factory<>();
+public class GetArgumentsModifier<I> implements SimpleNetworkItemProcessor<I> {
+    public static final Key ID = Key.of("gtemc:get_arguments");
+    public static final ItemProcessorFactory<?> FACTORY = new Factory<>();
     private final boolean attribute;
 
     public GetArgumentsModifier(boolean attribute) {
         this.attribute = attribute;
-    }
-
-    @Override
-    public Key type() {
-        return ItemDataModifiers.GET_ARGUMENTS;
     }
 
     @Override
@@ -69,10 +64,10 @@ public class GetArgumentsModifier<I> implements SimpleNetworkItemDataModifier<I>
         return item;
     }
 
-    public static class Factory<I> implements ItemDataModifierFactory<I> {
+    public static class Factory<I> implements ItemProcessorFactory<I> {
 
         @Override
-        public ItemDataModifier<I> create(Object arg) {
+        public ItemProcessor<I> create(Object arg) {
             Map<String, Object> args = ResourceConfigUtils.getAsMap(arg, "gtemc:get_arguments");
             boolean attribute = ResourceConfigUtils.getAsBoolean(args.get("attribute"), "attribute");
             return new GetArgumentsModifier<>(attribute);

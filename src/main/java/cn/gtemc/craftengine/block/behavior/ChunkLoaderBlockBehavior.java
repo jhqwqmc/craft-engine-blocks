@@ -4,16 +4,18 @@ import net.momirealms.craftengine.bukkit.block.behavior.BukkitBlockBehavior;
 import net.momirealms.craftengine.bukkit.nms.FastNMS;
 import net.momirealms.craftengine.bukkit.plugin.reflection.minecraft.CoreReflections;
 import net.momirealms.craftengine.bukkit.util.LocationUtils;
-import net.momirealms.craftengine.core.block.BlockBehavior;
 import net.momirealms.craftengine.core.block.CustomBlock;
+import net.momirealms.craftengine.core.block.behavior.BlockBehavior;
 import net.momirealms.craftengine.core.block.behavior.BlockBehaviorFactory;
+import net.momirealms.craftengine.core.util.Key;
 import net.momirealms.craftengine.core.world.BlockPos;
 
 import java.util.Map;
 import java.util.concurrent.Callable;
 
 public class ChunkLoaderBlockBehavior extends BukkitBlockBehavior {
-    public static final Factory FACTORY = new Factory();
+    public static final Key ID = Key.of("gtemc:chunk_loader_block");
+    public static final BlockBehaviorFactory FACTORY = new Factory();
 
     public ChunkLoaderBlockBehavior(CustomBlock customBlock) {
         super(customBlock);
@@ -42,7 +44,7 @@ public class ChunkLoaderBlockBehavior extends BukkitBlockBehavior {
         FastNMS.INSTANCE.method$ServerLevel$setChunkForced(serverLevel, blockX >> 4, blockZ >> 4, add);
     }
 
-    public static class Factory implements BlockBehaviorFactory {
+    private static class Factory implements BlockBehaviorFactory {
 
         @Override
         public BlockBehavior create(CustomBlock block, Map<String, Object> arguments) {

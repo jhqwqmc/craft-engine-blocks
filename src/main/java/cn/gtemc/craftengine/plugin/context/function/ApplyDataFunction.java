@@ -3,11 +3,11 @@ package cn.gtemc.craftengine.plugin.context.function;
 import cn.gtemc.craftengine.plugin.context.event.EventFunctions;
 import net.momirealms.craftengine.core.entity.player.Player;
 import net.momirealms.craftengine.core.item.ItemBuildContext;
-import net.momirealms.craftengine.core.item.modifier.ItemDataModifier;
+import net.momirealms.craftengine.core.item.processor.ItemProcessor;
+import net.momirealms.craftengine.core.item.processor.ItemProcessorType;
+import net.momirealms.craftengine.core.plugin.context.CommonConditions;
 import net.momirealms.craftengine.core.plugin.context.Condition;
 import net.momirealms.craftengine.core.plugin.context.Context;
-import net.momirealms.craftengine.core.plugin.context.PlayerOptionalContext;
-import net.momirealms.craftengine.core.plugin.context.event.EventConditions;
 import net.momirealms.craftengine.core.plugin.context.function.AbstractConditionalFunction;
 import net.momirealms.craftengine.core.plugin.context.function.Function;
 import net.momirealms.craftengine.core.plugin.context.parameter.DirectContextParameters;
@@ -21,12 +21,12 @@ import java.util.Map;
 import java.util.Optional;
 
 public class ApplyDataFunction<CTX extends Context> extends AbstractConditionalFunction<CTX> {
-    public static final FactoryImpl<Context> FACTORY = new FactoryImpl<>(EventConditions::fromMap);
-    private final ItemDataModifier<?>[] modifiers;
+    public static final FactoryImpl<Context> FACTORY = new FactoryImpl<>(CommonConditions::fromMap);
+    private final ItemProcessor<?>[] processors;
 
-    public ApplyDataFunction(List<Condition<CTX>> predicates, ItemDataModifier<?>[] modifiers) {
+    public ApplyDataFunction(List<Condition<CTX>> predicates, ItemProcessor<?>[] processors) {
         super(predicates);
-        this.modifiers = modifiers;
+        this.processors = processors;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -34,8 +34,8 @@ public class ApplyDataFunction<CTX extends Context> extends AbstractConditionalF
     protected void runInternal(CTX ctx) {
         Player player = ctx.getOptionalParameter(DirectContextParameters.PLAYER).orElse(null);
         ctx.getOptionalParameter(DirectContextParameters.ITEM_IN_HAND).ifPresent(item -> {
-            for (ItemDataModifier modifier : this.modifiers) {
-                modifier.apply(item, ItemBuildContext.of(player));
+            for (ItemProcessor processor : this.processors) {
+                processor.apply(item, ItemBuildContext.of(player));
             }
         });
     }
@@ -53,13 +53,14 @@ public class ApplyDataFunction<CTX extends Context> extends AbstractConditionalF
 
         @Override
         public Function<CTX> create(Map<String, Object> arguments) {
-            List<ItemDataModifier<?>> modifiers = new ArrayList<>();
+            List<ItemProcessor<?>> processors = new ArrayList<>();
             Map<String, Object> data = ResourceConfigUtils.getAsMap(arguments.get("data"), "data");
             for (Map.Entry<String, Object> entry : data.entrySet()) {
-                Optional.ofNullable(BuiltInRegistries.ITEM_DATA_MODIFIER_FACTORY.getValue(Key.withDefaultNamespace(entry.getKey(), Key.DEFAULT_NAMESPACE)))
-                        .ifPresent(factory -> modifiers.add(factory.create(entry.getValue())));
+                Optional.ofNullable(BuiltInRegistries.ITEM_PROCESSOR_TYPE.getValue(Key.withDefaultNamespace(entry.getKey(), Key.DEFAULT_NAMESPACE)))
+                        .map(ItemProcessorType::factory)
+                        .ifPresent(factory -> processors.add(factory.create(entry.getValue())));
             }
-            return new ApplyDataFunction<>(getPredicates(arguments), modifiers.toArray(new ItemDataModifier[0]));
+            return new ApplyDataFunction<>(getPredicates(arguments), processors.toArray(new ItemProcessor[0]));
         }
     }
 }

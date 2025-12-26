@@ -19,6 +19,7 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:${rootProject.properties["paper_version"]}-R0.1-SNAPSHOT")
     compileOnly("net.momirealms:craft-engine-core:${rootProject.properties["craftengine_version"]}")
     compileOnly("net.momirealms:craft-engine-bukkit:${rootProject.properties["craftengine_version"]}")
+    compileOnly("net.momirealms:craft-engine-adventure:${rootProject.properties["craftengine_version"]}")
     compileOnly("net.momirealms:craft-engine-nms-helper:${rootProject.properties["nms_helper_version"]}")
     compileOnly("net.momirealms:sparrow-nbt:${rootProject.properties["sparrow_nbt_version"]}")
     compileOnly("net.momirealms:sparrow-nbt-adventure:${rootProject.properties["sparrow_nbt_version"]}")

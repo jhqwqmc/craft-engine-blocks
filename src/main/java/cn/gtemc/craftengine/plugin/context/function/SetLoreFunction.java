@@ -5,12 +5,11 @@ import net.momirealms.craftengine.core.entity.player.InteractionHand;
 import net.momirealms.craftengine.core.entity.player.Player;
 import net.momirealms.craftengine.core.item.Item;
 import net.momirealms.craftengine.core.item.ItemBuildContext;
-import net.momirealms.craftengine.core.item.modifier.ItemDataModifier;
-import net.momirealms.craftengine.core.item.modifier.lore.LoreModifier;
+import net.momirealms.craftengine.core.item.processor.ItemProcessor;
+import net.momirealms.craftengine.core.item.processor.lore.LoreProcessor;
+import net.momirealms.craftengine.core.plugin.context.CommonConditions;
 import net.momirealms.craftengine.core.plugin.context.Condition;
 import net.momirealms.craftengine.core.plugin.context.Context;
-import net.momirealms.craftengine.core.plugin.context.PlayerOptionalContext;
-import net.momirealms.craftengine.core.plugin.context.event.EventConditions;
 import net.momirealms.craftengine.core.plugin.context.function.AbstractConditionalFunction;
 import net.momirealms.craftengine.core.plugin.context.function.Function;
 import net.momirealms.craftengine.core.plugin.context.selector.PlayerSelector;
@@ -25,21 +24,21 @@ import java.util.Optional;
 
 @SuppressWarnings({"unchecked", "rawtypes", "OptionalUsedAsFieldOrParameterType"})
 public class SetLoreFunction<CTX extends Context> extends AbstractConditionalFunction<CTX> {
-    public static final FactoryImpl<Context> FACTORY = new FactoryImpl<>(EventConditions::fromMap);
+    public static final FactoryImpl<Context> FACTORY = new FactoryImpl<>(CommonConditions::fromMap);
     private final PlayerSelector<CTX> selector;
     private final Optional<InteractionHand> hand;
-    private final ItemDataModifier<?> loreModifier;
+    private final ItemProcessor<?> itemProcessor;
 
     public SetLoreFunction(
             List<Condition<CTX>> predicates,
             PlayerSelector<CTX> selector,
             Optional<InteractionHand> optionalHand,
-            ItemDataModifier<?> loreModifier
+            ItemProcessor<?> itemProcessor
     ) {
         super(predicates);
         this.selector = selector;
         this.hand = optionalHand;
-        this.loreModifier = loreModifier;
+        this.itemProcessor = itemProcessor;
     }
 
     @Override
@@ -47,7 +46,7 @@ public class SetLoreFunction<CTX extends Context> extends AbstractConditionalFun
         for (Player player : this.selector.get(ctx)) {
             Item item = player.getItemInHand(this.hand.orElse(InteractionHand.MAIN_HAND));
             if (ItemUtils.isEmpty(item)) continue;
-            item.apply(this.loreModifier, ItemBuildContext.of(player));
+            item.apply(this.itemProcessor, ItemBuildContext.of(player));
         }
     }
 
@@ -66,8 +65,8 @@ public class SetLoreFunction<CTX extends Context> extends AbstractConditionalFun
         public Function<CTX> create(Map<String, Object> arguments) {
             PlayerSelector<CTX> selector = PlayerSelectors.fromObject(arguments.getOrDefault("target", "self"), conditionFactory());
             Optional<InteractionHand> optionalHand = Optional.ofNullable(arguments.get("hand")).map(it -> InteractionHand.valueOf(it.toString().toUpperCase(Locale.ENGLISH)));
-            ItemDataModifier<?> loreModifier = LoreModifier.createLoreModifier(arguments.get("lore"));
-            return new SetLoreFunction<>(getPredicates(arguments), selector, optionalHand, loreModifier);
+            LoreProcessor<?> loreProcessor = LoreProcessor.createLoreModifier(arguments.get("lore"));
+            return new SetLoreFunction<>(getPredicates(arguments), selector, optionalHand, loreProcessor);
         }
     }
 }
