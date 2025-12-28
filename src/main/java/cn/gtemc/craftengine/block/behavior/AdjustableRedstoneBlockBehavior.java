@@ -8,19 +8,16 @@ import net.momirealms.craftengine.bukkit.util.LocationUtils;
 import net.momirealms.craftengine.core.block.CustomBlock;
 import net.momirealms.craftengine.core.block.ImmutableBlockState;
 import net.momirealms.craftengine.core.block.UpdateOption;
-import net.momirealms.craftengine.core.block.behavior.BlockBehavior;
 import net.momirealms.craftengine.core.block.behavior.BlockBehaviorFactory;
 import net.momirealms.craftengine.core.block.properties.IntegerProperty;
 import net.momirealms.craftengine.core.entity.player.InteractionResult;
-import net.momirealms.craftengine.core.util.Key;
 import net.momirealms.craftengine.core.world.context.UseOnContext;
 
 import java.util.Map;
 import java.util.concurrent.Callable;
 
 public class AdjustableRedstoneBlockBehavior extends BukkitBlockBehavior {
-    public static final Key ID = Key.of("gtemc:adjustable_redstone_block");
-    public static final BlockBehaviorFactory FACTORY = new Factory();
+    public static final BlockBehaviorFactory<AdjustableRedstoneBlockBehavior> FACTORY = new Factory();
     private final IntegerProperty powerProperty;
 
     public AdjustableRedstoneBlockBehavior(CustomBlock customBlock, IntegerProperty power) {
@@ -74,10 +71,10 @@ public class AdjustableRedstoneBlockBehavior extends BukkitBlockBehavior {
         return state.get(this.powerProperty);
     }
 
-    private static class Factory implements BlockBehaviorFactory {
+    private static class Factory implements BlockBehaviorFactory<AdjustableRedstoneBlockBehavior> {
 
         @Override
-        public BlockBehavior create(CustomBlock block, Map<String, Object> arguments) {
+        public AdjustableRedstoneBlockBehavior create(CustomBlock block, Map<String, Object> arguments) {
             IntegerProperty power = (IntegerProperty) block.getProperty("power");
             if (power == null) {
                 throw new IllegalArgumentException("方块 '" + block.id() + "' 的 'gtemc:adjustable_redstone_block' 行为缺少必需的 'power' 属性");

@@ -18,7 +18,6 @@ import net.momirealms.craftengine.bukkit.util.LocationUtils;
 import net.momirealms.craftengine.bukkit.world.BukkitWorldManager;
 import net.momirealms.craftengine.core.block.CustomBlock;
 import net.momirealms.craftengine.core.block.ImmutableBlockState;
-import net.momirealms.craftengine.core.block.behavior.BlockBehavior;
 import net.momirealms.craftengine.core.block.behavior.BlockBehaviorFactory;
 import net.momirealms.craftengine.core.block.properties.Property;
 import net.momirealms.craftengine.core.entity.player.InteractionHand;
@@ -43,8 +42,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class PlaceBlockBehavior extends FacingTriggerableBlockBehavior {
-    public static final Key ID = Key.of("gtemc:place_block");
-    public static final BlockBehaviorFactory FACTORY = new Factory();
+    public static final BlockBehaviorFactory<PlaceBlockBehavior> FACTORY = new Factory();
 
     public PlaceBlockBehavior(CustomBlock customBlock, Property<Direction> facing, Property<Boolean> triggered, Set<Key> blocks, boolean whitelistMode) {
         super(customBlock, facing, triggered, blocks, whitelistMode);
@@ -259,11 +257,11 @@ public class PlaceBlockBehavior extends FacingTriggerableBlockBehavior {
         }
     }
 
-    private static class Factory implements BlockBehaviorFactory {
+    private static class Factory implements BlockBehaviorFactory<PlaceBlockBehavior> {
 
         @Override
         @SuppressWarnings({"unchecked", "DuplicatedCode"})
-        public BlockBehavior create(CustomBlock block, Map<String, Object> arguments) {
+        public PlaceBlockBehavior create(CustomBlock block, Map<String, Object> arguments) {
             Property<Direction> facing = (Property<Direction>) block.getProperty("facing");
             if (facing == null) {
                 throw new IllegalArgumentException("方块 '" + block.id() + "' 的 'gtemc:place_block' 行为缺少必需的 'facing' 属性");

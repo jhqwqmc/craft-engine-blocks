@@ -1,21 +1,19 @@
 package cn.gtemc.craftengine.plugin.context.function;
 
-import cn.gtemc.craftengine.plugin.context.event.EventFunctions;
 import net.momirealms.craftengine.core.entity.player.InteractionHand;
 import net.momirealms.craftengine.core.entity.player.Player;
 import net.momirealms.craftengine.core.item.Item;
 import net.momirealms.craftengine.core.item.ItemBuildContext;
 import net.momirealms.craftengine.core.item.processor.ItemProcessor;
 import net.momirealms.craftengine.core.item.processor.lore.LoreProcessor;
-import net.momirealms.craftengine.core.plugin.context.CommonConditions;
 import net.momirealms.craftengine.core.plugin.context.Condition;
 import net.momirealms.craftengine.core.plugin.context.Context;
 import net.momirealms.craftengine.core.plugin.context.function.AbstractConditionalFunction;
 import net.momirealms.craftengine.core.plugin.context.function.Function;
+import net.momirealms.craftengine.core.plugin.context.function.FunctionFactory;
 import net.momirealms.craftengine.core.plugin.context.selector.PlayerSelector;
 import net.momirealms.craftengine.core.plugin.context.selector.PlayerSelectors;
 import net.momirealms.craftengine.core.util.ItemUtils;
-import net.momirealms.craftengine.core.util.Key;
 
 import java.util.List;
 import java.util.Locale;
@@ -24,7 +22,6 @@ import java.util.Optional;
 
 @SuppressWarnings({"unchecked", "rawtypes", "OptionalUsedAsFieldOrParameterType"})
 public class SetLoreFunction<CTX extends Context> extends AbstractConditionalFunction<CTX> {
-    public static final FactoryImpl<Context> FACTORY = new FactoryImpl<>(CommonConditions::fromMap);
     private final PlayerSelector<CTX> selector;
     private final Optional<InteractionHand> hand;
     private final ItemProcessor<?> itemProcessor;
@@ -50,14 +47,13 @@ public class SetLoreFunction<CTX extends Context> extends AbstractConditionalFun
         }
     }
 
-    @Override
-    public Key type() {
-        return EventFunctions.SET_LORE;
+    public static <CTX extends Context> FunctionFactory<CTX> factory(java.util.function.Function<Map<String, Object>, Condition<CTX>> factory) {
+        return new SetLoreFunction.Factory<>(factory);
     }
 
-    public static class FactoryImpl<CTX extends Context> extends AbstractFactory<CTX> {
+    public static class Factory<CTX extends Context> extends AbstractFactory<CTX> {
 
-        public FactoryImpl(java.util.function.Function<Map<String, Object>, Condition<CTX>> factory) {
+        public Factory(java.util.function.Function<Map<String, Object>, Condition<CTX>> factory) {
             super(factory);
         }
 

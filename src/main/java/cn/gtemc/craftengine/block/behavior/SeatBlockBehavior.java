@@ -6,13 +6,11 @@ import net.momirealms.craftengine.bukkit.block.behavior.BukkitBlockBehavior;
 import net.momirealms.craftengine.bukkit.plugin.user.BukkitServerPlayer;
 import net.momirealms.craftengine.core.block.CustomBlock;
 import net.momirealms.craftengine.core.block.ImmutableBlockState;
-import net.momirealms.craftengine.core.block.behavior.BlockBehavior;
 import net.momirealms.craftengine.core.block.behavior.BlockBehaviorFactory;
 import net.momirealms.craftengine.core.block.behavior.EntityBlockBehavior;
 import net.momirealms.craftengine.core.block.entity.BlockEntity;
 import net.momirealms.craftengine.core.block.entity.BlockEntityType;
 import net.momirealms.craftengine.core.entity.player.InteractionResult;
-import net.momirealms.craftengine.core.util.Key;
 import net.momirealms.craftengine.core.util.ResourceConfigUtils;
 import net.momirealms.craftengine.core.world.BlockPos;
 import net.momirealms.craftengine.core.world.CEWorld;
@@ -24,8 +22,7 @@ import java.util.Map;
 
 @SuppressWarnings("UnstableApiUsage")
 public class SeatBlockBehavior extends BukkitBlockBehavior implements EntityBlockBehavior {
-    public static final Key ID = Key.of("gtemc:seat_block");
-    public static final BlockBehaviorFactory FACTORY = new Factory();
+    public static final BlockBehaviorFactory<SeatBlockBehavior> FACTORY = new Factory();
     private final Vector3f offset;
     private final float yaw;
     private final boolean limitPlayerRotation;
@@ -63,10 +60,10 @@ public class SeatBlockBehavior extends BukkitBlockBehavior implements EntityBloc
         return new SeatBlockEntity(pos, state, this.offset, this.yaw, this.limitPlayerRotation);
     }
 
-    private static class Factory implements BlockBehaviorFactory {
+    private static class Factory implements BlockBehaviorFactory<SeatBlockBehavior> {
 
         @Override
-        public BlockBehavior create(CustomBlock block, Map<String, Object> arguments) {
+        public SeatBlockBehavior create(CustomBlock block, Map<String, Object> arguments) {
             Vector3f offset = ResourceConfigUtils.getAsVector3f(arguments.getOrDefault("offset", "0,0,0"), "offset");
             float yaw = ResourceConfigUtils.getAsFloat(arguments.getOrDefault("yaw", 0f), "yaw");
             boolean limitPlayerRotation = ResourceConfigUtils.getAsBoolean(arguments.getOrDefault("limit-player-rotation", true), "limit-player-rotation");

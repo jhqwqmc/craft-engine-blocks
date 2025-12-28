@@ -1,15 +1,14 @@
 package cn.gtemc.craftengine.plugin.context.function;
 
-import cn.gtemc.craftengine.plugin.context.event.EventFunctions;
 import net.momirealms.craftengine.core.entity.player.Player;
 import net.momirealms.craftengine.core.item.ItemBuildContext;
 import net.momirealms.craftengine.core.item.processor.ItemProcessor;
 import net.momirealms.craftengine.core.item.processor.ItemProcessorType;
-import net.momirealms.craftengine.core.plugin.context.CommonConditions;
 import net.momirealms.craftengine.core.plugin.context.Condition;
 import net.momirealms.craftengine.core.plugin.context.Context;
 import net.momirealms.craftengine.core.plugin.context.function.AbstractConditionalFunction;
 import net.momirealms.craftengine.core.plugin.context.function.Function;
+import net.momirealms.craftengine.core.plugin.context.function.FunctionFactory;
 import net.momirealms.craftengine.core.plugin.context.parameter.DirectContextParameters;
 import net.momirealms.craftengine.core.registry.BuiltInRegistries;
 import net.momirealms.craftengine.core.util.Key;
@@ -21,7 +20,6 @@ import java.util.Map;
 import java.util.Optional;
 
 public class ApplyDataFunction<CTX extends Context> extends AbstractConditionalFunction<CTX> {
-    public static final FactoryImpl<Context> FACTORY = new FactoryImpl<>(CommonConditions::fromMap);
     private final ItemProcessor<?>[] processors;
 
     public ApplyDataFunction(List<Condition<CTX>> predicates, ItemProcessor<?>[] processors) {
@@ -40,14 +38,13 @@ public class ApplyDataFunction<CTX extends Context> extends AbstractConditionalF
         });
     }
 
-    @Override
-    public Key type() {
-        return EventFunctions.APPLY_DATA;
+    public static <CTX extends Context> FunctionFactory<CTX> factory(java.util.function.Function<Map<String, Object>, Condition<CTX>> factory) {
+        return new ApplyDataFunction.Factory<>(factory);
     }
 
-    public static class FactoryImpl<CTX extends Context> extends AbstractFactory<CTX> {
+    public static class Factory<CTX extends Context> extends AbstractFactory<CTX> {
 
-        public FactoryImpl(java.util.function.Function<Map<String, Object>, Condition<CTX>> factory) {
+        public Factory(java.util.function.Function<Map<String, Object>, Condition<CTX>> factory) {
             super(factory);
         }
 
