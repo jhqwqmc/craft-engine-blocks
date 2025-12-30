@@ -7,9 +7,11 @@ import net.momirealms.craftengine.core.block.entity.BlockEntity;
 import net.momirealms.craftengine.core.block.entity.BlockEntityType;
 import net.momirealms.craftengine.core.item.ItemProcessorFactory;
 import net.momirealms.craftengine.core.item.ItemSettings;
+import net.momirealms.craftengine.core.item.processor.ItemProcessor;
 import net.momirealms.craftengine.core.item.processor.ItemProcessorType;
+import net.momirealms.craftengine.core.plugin.context.CommonFunctionType;
 import net.momirealms.craftengine.core.plugin.context.Context;
-import net.momirealms.craftengine.core.plugin.context.FunctionType;
+import net.momirealms.craftengine.core.plugin.context.function.Function;
 import net.momirealms.craftengine.core.plugin.context.function.FunctionFactory;
 import net.momirealms.craftengine.core.registry.BuiltInRegistries;
 import net.momirealms.craftengine.core.registry.Registries;
@@ -33,9 +35,9 @@ public class RegistryUtils {
         return type;
     }
 
-    public static <CTX extends Context> FunctionType<CTX> registerEventFunction(Key key, FunctionFactory<CTX> factory) {
-        FunctionType<CTX> type = new FunctionType<>(key, factory);
-        ((WritableRegistry<FunctionType<?>>) BuiltInRegistries.COMMON_FUNCTION_TYPE)
+    public static <T extends Function<Context>> CommonFunctionType<T> registerEventFunction(Key key, FunctionFactory<Context, T> factory) {
+        CommonFunctionType<T> type = new CommonFunctionType<>(key, factory);
+        ((WritableRegistry<CommonFunctionType<?>>) BuiltInRegistries.COMMON_FUNCTION_TYPE)
                 .register(ResourceKey.create(Registries.COMMON_FUNCTION_TYPE.location(), key), type);
         return type;
     }
@@ -44,7 +46,7 @@ public class RegistryUtils {
         ItemSettings.Modifiers.registerFactory(key.asString(), factory);
     }
 
-    public static <T> ItemProcessorType<T> registerItemProcessorType(Key key, ItemProcessorFactory<T> factory) {
+    public static <T extends ItemProcessor> ItemProcessorType<T> registerItemProcessorType(Key key, ItemProcessorFactory<T> factory) {
         ItemProcessorType<T> type = new ItemProcessorType<>(key, factory);
         ((WritableRegistry<ItemProcessorType<?>>) BuiltInRegistries.ITEM_PROCESSOR_TYPE)
                 .register(ResourceKey.create(Registries.ITEM_PROCESSOR_TYPE.location(), key), type);

@@ -9,10 +9,8 @@ import net.momirealms.craftengine.core.item.CustomItem;
 import net.momirealms.craftengine.core.item.Item;
 import net.momirealms.craftengine.core.item.ItemBuildContext;
 import net.momirealms.craftengine.core.item.ItemProcessorFactory;
-import net.momirealms.craftengine.core.item.processor.ItemProcessor;
 import net.momirealms.craftengine.core.item.processor.SimpleNetworkItemProcessor;
 import net.momirealms.craftengine.core.plugin.context.ContextKey;
-import net.momirealms.craftengine.core.util.Key;
 import net.momirealms.craftengine.core.util.ResourceConfigUtils;
 import net.momirealms.craftengine.libraries.nbt.CompoundTag;
 import net.momirealms.craftengine.libraries.nbt.DoubleTag;
@@ -22,9 +20,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public class GetArgumentsModifier<I> implements SimpleNetworkItemProcessor<I> {
-    public static final Key ID = Key.of("gtemc:get_arguments");
-    public static final ItemProcessorFactory<?> FACTORY = new Factory<>();
+public class GetArgumentsModifier implements SimpleNetworkItemProcessor {
+    public static final ItemProcessorFactory<GetArgumentsModifier> FACTORY = new Factory();
     private final boolean attribute;
 
     public GetArgumentsModifier(boolean attribute) {
@@ -32,7 +29,7 @@ public class GetArgumentsModifier<I> implements SimpleNetworkItemProcessor<I> {
     }
 
     @Override
-    public Item<I> prepareNetworkItem(Item<I> item, ItemBuildContext context, CompoundTag networkData) {
+    public <I> Item<I> prepareNetworkItem(Item<I> item, ItemBuildContext context, CompoundTag networkData) {
         RandomNumberContext randomNumberContext = RandomNumberContext.of(context.player(), item);
         if (this.attribute) {
             List<AttributeModifier> attributeModifiers = new ObjectArrayList<>();
@@ -60,17 +57,17 @@ public class GetArgumentsModifier<I> implements SimpleNetworkItemProcessor<I> {
     }
 
     @Override
-    public Item<I> apply(Item<I> item, ItemBuildContext context) {
+    public <I> Item<I> apply(Item<I> item, ItemBuildContext context) {
         return item;
     }
 
-    public static class Factory<I> implements ItemProcessorFactory<I> {
+    public static class Factory implements ItemProcessorFactory<GetArgumentsModifier> {
 
         @Override
-        public ItemProcessor<I> create(Object arg) {
+        public GetArgumentsModifier create(Object arg) {
             Map<String, Object> args = ResourceConfigUtils.getAsMap(arg, "gtemc:get_arguments");
             boolean attribute = ResourceConfigUtils.getAsBoolean(args.get("attribute"), "attribute");
-            return new GetArgumentsModifier<>(attribute);
+            return new GetArgumentsModifier(attribute);
         }
     }
 }
