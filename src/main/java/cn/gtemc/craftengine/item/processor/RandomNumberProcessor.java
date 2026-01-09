@@ -1,4 +1,4 @@
-package cn.gtemc.craftengine.item.modifier;
+package cn.gtemc.craftengine.item.processor;
 
 import cn.gtemc.craftengine.plugin.context.RandomNumberContext;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -14,11 +14,11 @@ import net.momirealms.craftengine.libraries.nbt.CompoundTag;
 
 import java.util.Map;
 
-public class RandomNumberModifier implements SimpleNetworkItemProcessor {
-    public static final ItemProcessorFactory<RandomNumberModifier> FACTORY = new Factory();
+public class RandomNumberProcessor implements SimpleNetworkItemProcessor {
+    public static final ItemProcessorFactory<RandomNumberProcessor> FACTORY = new Factory();
     private final Map<String, NumberProvider> numberProviders;
 
-    public RandomNumberModifier(Map<String, NumberProvider> numberProviders) {
+    public RandomNumberProcessor(Map<String, NumberProvider> numberProviders) {
         this.numberProviders = numberProviders;
     }
 
@@ -34,16 +34,16 @@ public class RandomNumberModifier implements SimpleNetworkItemProcessor {
         return item;
     }
 
-    private static class Factory implements ItemProcessorFactory<RandomNumberModifier> {
+    private static class Factory implements ItemProcessorFactory<RandomNumberProcessor> {
 
         @Override
-        public RandomNumberModifier create(Object arg) {
+        public RandomNumberProcessor create(Object arg) {
             Map<String, Object> data = ResourceConfigUtils.getAsMap(arg, "gtemc:random_number");
             Map<String, NumberProvider> numberProviders = new Object2ObjectOpenHashMap<>();
             for (Map.Entry<String, Object> entry : data.entrySet()) {
                 numberProviders.put(entry.getKey(), NumberProviders.fromObject(entry.getValue()));
             }
-            return new RandomNumberModifier(numberProviders);
+            return new RandomNumberProcessor(numberProviders);
         }
     }
 }

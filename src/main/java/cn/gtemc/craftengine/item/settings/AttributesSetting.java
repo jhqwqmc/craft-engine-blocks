@@ -1,6 +1,7 @@
 package cn.gtemc.craftengine.item.settings;
 
 import net.momirealms.craftengine.core.attribute.AttributeModifier;
+import net.momirealms.craftengine.core.item.CustomItemSettingType;
 import net.momirealms.craftengine.core.item.ItemSettings;
 import net.momirealms.craftengine.core.item.processor.AttributeModifiersProcessor;
 import net.momirealms.craftengine.core.plugin.context.CommonConditions;
@@ -15,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class AttributesSetting implements ItemSettings.Modifier {
+    public static final CustomItemSettingType<List<AttributeData>> ATTRIBUTES = CustomItemSettingType.simple();
     public static final Factory FACTORY = new Factory();
     private final List<AttributeData> data;
 
@@ -24,7 +26,7 @@ public class AttributesSetting implements ItemSettings.Modifier {
 
     @Override
     public void apply(ItemSettings settings) {
-        settings.addCustomData(AttributeDataType.INSTANCE, this.data);
+        settings.addCustomData(ATTRIBUTES, this.data);
     }
 
     public static class Factory implements ItemSettings.Modifier.Factory {
@@ -71,8 +73,4 @@ public class AttributesSetting implements ItemSettings.Modifier {
             @Nullable Date expires,
             @Nullable Condition<Context> conditions
     ) {}
-
-    public static class AttributeDataType extends CustomDataType<List<AttributeData>> {
-        public static final AttributeDataType INSTANCE = new AttributeDataType();
-    }
 }

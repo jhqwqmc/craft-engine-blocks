@@ -50,7 +50,7 @@ public class ItemManager implements Manageable, Listener {
         if (customItem == null) {
             return;
         }
-        List<AttributesSetting.AttributeData> data = customItem.settings().getCustomData(AttributesSetting.AttributeDataType.INSTANCE);
+        List<AttributesSetting.AttributeData> data = customItem.settings().getCustomData(AttributesSetting.ATTRIBUTES);
         if (data == null || data.isEmpty()) {
             return;
         }
@@ -75,7 +75,7 @@ public class ItemManager implements Manageable, Listener {
             return;
         }
         RandomNumberContext context = RandomNumberContext.of(player, item);
-        List<AttributesSetting.AttributeData> data = customItem.settings().getCustomData(AttributesSetting.AttributeDataType.INSTANCE);
+        List<AttributesSetting.AttributeData> data = customItem.settings().getCustomData(AttributesSetting.ATTRIBUTES);
         if (data == null || data.isEmpty()) {
             return;
         }

@@ -1,4 +1,4 @@
-package cn.gtemc.craftengine.item.modifier;
+package cn.gtemc.craftengine.item.processor;
 
 import cn.gtemc.craftengine.item.settings.AttributesSetting;
 import cn.gtemc.craftengine.plugin.context.RandomNumberContext;
@@ -20,11 +20,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public class GetArgumentsModifier implements SimpleNetworkItemProcessor {
-    public static final ItemProcessorFactory<GetArgumentsModifier> FACTORY = new Factory();
+public class GetArgumentsProcessor implements SimpleNetworkItemProcessor {
+    public static final ItemProcessorFactory<GetArgumentsProcessor> FACTORY = new Factory();
     private final boolean attribute;
 
-    public GetArgumentsModifier(boolean attribute) {
+    public GetArgumentsProcessor(boolean attribute) {
         this.attribute = attribute;
     }
 
@@ -35,7 +35,7 @@ public class GetArgumentsModifier implements SimpleNetworkItemProcessor {
             List<AttributeModifier> attributeModifiers = new ObjectArrayList<>();
             CustomItem<I> customItem = item.getCustomItem().orElse(null);
             if (customItem != null) {
-                List<AttributesSetting.AttributeData> attributeDataList = customItem.settings().getCustomData(AttributesSetting.AttributeDataType.INSTANCE);
+                List<AttributesSetting.AttributeData> attributeDataList = customItem.settings().getCustomData(AttributesSetting.ATTRIBUTES);
                 for (AttributesSetting.AttributeData attributeData : attributeDataList) {
                     if (attributeData.expires() != null && attributeData.expires().before(new Date())) continue; // 过期不管
                     if (attributeData.conditions() != null && !attributeData.conditions().test(randomNumberContext)) continue; // 不符合条件不管
@@ -61,13 +61,13 @@ public class GetArgumentsModifier implements SimpleNetworkItemProcessor {
         return item;
     }
 
-    public static class Factory implements ItemProcessorFactory<GetArgumentsModifier> {
+    public static class Factory implements ItemProcessorFactory<GetArgumentsProcessor> {
 
         @Override
-        public GetArgumentsModifier create(Object arg) {
+        public GetArgumentsProcessor create(Object arg) {
             Map<String, Object> args = ResourceConfigUtils.getAsMap(arg, "gtemc:get_arguments");
             boolean attribute = ResourceConfigUtils.getAsBoolean(args.get("attribute"), "attribute");
-            return new GetArgumentsModifier(attribute);
+            return new GetArgumentsProcessor(attribute);
         }
     }
 }
