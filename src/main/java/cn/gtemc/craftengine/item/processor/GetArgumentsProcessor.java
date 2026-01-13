@@ -20,7 +20,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public class GetArgumentsProcessor implements SimpleNetworkItemProcessor {
+public final class GetArgumentsProcessor implements SimpleNetworkItemProcessor {
     public static final ItemProcessorFactory<GetArgumentsProcessor> FACTORY = new Factory();
     private final boolean attribute;
 

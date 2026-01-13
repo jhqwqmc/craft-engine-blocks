@@ -17,6 +17,7 @@
 ## 拓展物品数据
 - [X] 固定随机值 (用于动态属性数值随机化)
 - [X] 获取参数 (仅用于客户端侧物品数据从物品获取固定随机值参数)
+- [X] 附魔描述 (适用于通过客户端侧物品数据自定义附魔显示的效果)
 
 ## 参考项目
 我从以下开源项目借鉴了一些代码
@@ -25,4 +26,21 @@
 
 ## 示例配置
 
+### 镐方块 & 放置方块
+
 [block_extension_demo.zip](demo/block_extension_demo.zip)
+
+### 附魔描述
+
+```yaml
+items:
+  default:topaz_pickaxe:
+    material: golden_pickaxe
+    client-bound-data:
+      hide-tooltip:
+        - enchantments
+      gtemc:enchantments_lore:
+        efficiency: |-
+          <!i><gray><lang:enchantment.%id_namespace%.%id_value%> <lang:enchantment.level.%level%>
+            增加 <green><expr:0.##:'20 + 5 * %level%'>%</green> 挖掘速度
+```

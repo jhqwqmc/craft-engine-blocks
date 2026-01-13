@@ -14,7 +14,7 @@ import net.momirealms.craftengine.libraries.nbt.CompoundTag;
 
 import java.util.Map;
 
-public class RandomNumberProcessor implements SimpleNetworkItemProcessor {
+public final class RandomNumberProcessor implements SimpleNetworkItemProcessor {
     public static final ItemProcessorFactory<RandomNumberProcessor> FACTORY = new Factory();
     private final Map<String, NumberProvider> numberProviders;
 
