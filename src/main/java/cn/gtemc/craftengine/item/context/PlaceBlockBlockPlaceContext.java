@@ -14,6 +14,6 @@ public class PlaceBlockBlockPlaceContext extends BlockPlaceContext {
 
     @Override
     public Direction getNearestLookingDirection() {
-        return this.getHitResult().getDirection();
+        return this.getHitResult().direction();
     }
 }
