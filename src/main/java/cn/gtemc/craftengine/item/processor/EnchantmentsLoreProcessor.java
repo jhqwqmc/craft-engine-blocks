@@ -8,9 +8,10 @@ import net.momirealms.craftengine.core.item.ItemBuildContext;
 import net.momirealms.craftengine.core.item.ItemProcessorFactory;
 import net.momirealms.craftengine.core.item.data.Enchantment;
 import net.momirealms.craftengine.core.item.processor.SimpleNetworkItemProcessor;
+import net.momirealms.craftengine.core.plugin.config.ConfigSection;
+import net.momirealms.craftengine.core.plugin.config.ConfigValue;
 import net.momirealms.craftengine.core.util.AdventureHelper;
 import net.momirealms.craftengine.core.util.Key;
-import net.momirealms.craftengine.core.util.ResourceConfigUtils;
 import net.momirealms.craftengine.libraries.adventure.text.Component;
 import net.momirealms.craftengine.libraries.adventure.text.format.NamedTextColor;
 import net.momirealms.craftengine.libraries.adventure.text.format.Style;
@@ -70,16 +71,12 @@ public record EnchantmentsLoreProcessor(Map<Key, String> descriptions) implement
     private static class Factory implements ItemProcessorFactory<EnchantmentsLoreProcessor> {
 
         @Override
-        public EnchantmentsLoreProcessor create(Object arg) {
+        public EnchantmentsLoreProcessor create(ConfigValue value) {
             Map<Key, String> descriptions = new Object2ObjectOpenHashMap<>();
-            Map<String, Object> raw = ResourceConfigUtils.getAsMap(arg, "gtemc:enchantments_lore");
-            for (Map.Entry<String, Object> entry : raw.entrySet()) {
-                Key id = Key.of(entry.getKey());
-                Object value = entry.getValue();
-                if (value == null) continue;
-                String string = value.toString();
-                if (string.isEmpty()) continue;
-                descriptions.put(id, string);
+            ConfigSection section = value.getAsSection();
+            for (String key : section.keySet()) {
+                Key id = Key.of(key);
+                descriptions.put(id, section.getNonEmptyString(key));
             }
             return new EnchantmentsLoreProcessor(descriptions);
         }

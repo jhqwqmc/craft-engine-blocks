@@ -5,20 +5,26 @@ import cn.gtemc.craftengine.util.Reflections;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.momirealms.craftengine.bukkit.block.BukkitBlockManager;
 import net.momirealms.craftengine.bukkit.block.behavior.BukkitBlockBehavior;
-import net.momirealms.craftengine.bukkit.nms.FastNMS;
-import net.momirealms.craftengine.bukkit.plugin.reflection.minecraft.MBuiltInRegistries;
 import net.momirealms.craftengine.bukkit.util.BlockStateUtils;
 import net.momirealms.craftengine.bukkit.util.DirectionUtils;
 import net.momirealms.craftengine.bukkit.util.KeyUtils;
 import net.momirealms.craftengine.core.block.CustomBlock;
 import net.momirealms.craftengine.core.block.ImmutableBlockState;
+import net.momirealms.craftengine.core.block.UpdateFlags;
 import net.momirealms.craftengine.core.block.properties.Property;
 import net.momirealms.craftengine.core.entity.player.Player;
 import net.momirealms.craftengine.core.util.Direction;
 import net.momirealms.craftengine.core.util.Key;
 import net.momirealms.craftengine.core.world.context.BlockPlaceContext;
+import net.momirealms.craftengine.proxy.minecraft.core.DirectionProxy;
+import net.momirealms.craftengine.proxy.minecraft.core.RegistryProxy;
+import net.momirealms.craftengine.proxy.minecraft.core.registries.BuiltInRegistriesProxy;
+import net.momirealms.craftengine.proxy.minecraft.world.level.LevelWriterProxy;
+import net.momirealms.craftengine.proxy.minecraft.world.level.ScheduledTickAccessProxy;
+import net.momirealms.craftengine.proxy.minecraft.world.level.SignalGetterProxy;
+import net.momirealms.craftengine.proxy.minecraft.world.level.block.state.BlockBehaviourProxy;
+import net.momirealms.craftengine.proxy.minecraft.world.level.block.state.BlockStateProxy;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -60,16 +66,16 @@ public abstract class FacingTriggerableBlockBehavior extends BukkitBlockBehavior
         Object state = args[0];
         Object level = args[1];
         Object pos = args[2];
-        boolean hasNeighborSignal = FastNMS.INSTANCE.method$SignalGetter$hasNeighborSignal(level, pos);
+        boolean hasNeighborSignal = SignalGetterProxy.INSTANCE.hasNeighborSignal(level, pos);
         ImmutableBlockState blockState = BukkitBlockManager.instance().getImmutableBlockState(BlockStateUtils.blockStateToId(state));
         if (blockState == null || blockState.isEmpty()) return;
         boolean triggeredValue = blockState.get(this.triggeredProperty);
         if (hasNeighborSignal && !triggeredValue) {
             Object tickState = blockState.with(this.triggeredProperty, true).customBlockState().literalObject();
-            FastNMS.INSTANCE.method$LevelWriter$setBlock(level, pos, tickState, 2);
-            FastNMS.INSTANCE.method$ScheduledTickAccess$scheduleBlockTick(level, pos, BlockStateUtils.getBlockOwner(tickState), 1, this.getTickPriority());
+            LevelWriterProxy.INSTANCE.setBlock(level, pos, tickState, UpdateFlags.UPDATE_CLIENTS);
+            ScheduledTickAccessProxy.INSTANCE.scheduleTick$0(level, pos, BlockStateUtils.getBlockOwner(tickState), 1, this.getTickPriority());
         } else if (!hasNeighborSignal && triggeredValue) {
-            FastNMS.INSTANCE.method$LevelWriter$setBlock(level, pos, blockState.with(this.triggeredProperty, false).customBlockState().literalObject(), 2);
+            LevelWriterProxy.INSTANCE.setBlock(level, pos, blockState.with(this.triggeredProperty, false).customBlockState().literalObject(), UpdateFlags.UPDATE_CLIENTS);
         }
     }
 
@@ -82,26 +88,22 @@ public abstract class FacingTriggerableBlockBehavior extends BukkitBlockBehavior
         if (player == null) {
             return null;
         }
-        Direction direction = DirectionUtils.fromNMSDirection(FastNMS.INSTANCE.method$Direction$getOpposite(orderedByNearest(player.serverPlayer())[0]));
+        Direction direction = DirectionUtils.fromNMSDirection(DirectionProxy.INSTANCE.getOpposite(orderedByNearest(player.serverPlayer())[0]));
         return state.owner().value().defaultState().with(this.facingProperty, direction);
     }
 
     private Object[] orderedByNearest(Object entity) {
-        try {
-            return (Object[]) Reflections.method$Direction$orderedByNearest.invoke(null, entity);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(e);
-        }
+        return (Object[]) Reflections.method$Direction$orderedByNearest.invoke(null, entity);
     }
 
     protected boolean blockCheckByBlockState(Object blockState) {
-        if (blockState == null || FastNMS.INSTANCE.method$BlockStateBase$isAir(blockState)) {
+        if (blockState == null || BlockBehaviourProxy.BlockStateBaseProxy.INSTANCE.isAir(blockState)) {
             return false;
         }
         Key blockId = Optional.ofNullable(BukkitBlockManager.instance().getImmutableBlockState(BlockStateUtils.blockStateToId(blockState)))
                 .filter(state -> !state.isEmpty())
                 .map(state -> state.owner().value().id())
-                .orElseGet(() -> KeyUtils.resourceLocationToKey(FastNMS.INSTANCE.method$Registry$getKey(MBuiltInRegistries.BLOCK, FastNMS.INSTANCE.method$BlockState$getBlock(blockState))));
+                .orElseGet(() -> KeyUtils.identifierToKey(RegistryProxy.INSTANCE.getKey(BuiltInRegistriesProxy.BLOCK, BlockStateProxy.INSTANCE.getBlock(blockState))));
         return blockCheckByKey(blockId);
     }
 

@@ -8,7 +8,6 @@
 
 ## Extended Block Behaviors
 - [X] Adjustable Redstone Block
-- [X] Chunk Loader (Force loading might not be removed correctly if the block is not broken by a player)
 - [X] Pickaxe Block
 - [X] Placer Block
 - [X] Chair Block (Block Entity)
@@ -57,7 +56,6 @@ items:
 
 ## 拓展方块行为
 - [X] 可调节红石块
-- [X] 区块加载器 (如果不是玩家破坏的方块可能会导致无法正确移除强加载)
 - [X] 镐方块
 - [X] 放置方块
 - [X] 座椅方块 (方块实体)

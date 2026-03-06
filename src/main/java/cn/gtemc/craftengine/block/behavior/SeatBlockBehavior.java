@@ -11,14 +11,13 @@ import net.momirealms.craftengine.core.block.behavior.EntityBlockBehavior;
 import net.momirealms.craftengine.core.block.entity.BlockEntity;
 import net.momirealms.craftengine.core.block.entity.BlockEntityType;
 import net.momirealms.craftengine.core.entity.player.InteractionResult;
-import net.momirealms.craftengine.core.util.ResourceConfigUtils;
+import net.momirealms.craftengine.core.plugin.config.ConfigConstants;
+import net.momirealms.craftengine.core.plugin.config.ConfigSection;
 import net.momirealms.craftengine.core.world.BlockPos;
 import net.momirealms.craftengine.core.world.CEWorld;
 import net.momirealms.craftengine.core.world.context.UseOnContext;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-
-import java.util.Map;
 
 @SuppressWarnings("UnstableApiUsage")
 public class SeatBlockBehavior extends BukkitBlockBehavior implements EntityBlockBehavior {
@@ -61,13 +60,16 @@ public class SeatBlockBehavior extends BukkitBlockBehavior implements EntityBloc
     }
 
     private static class Factory implements BlockBehaviorFactory<SeatBlockBehavior> {
+        private static final String[] LIMIT_PLAYER_ROTATION = new String[]{"limit_player_rotation", "limit-player-rotation"};
 
         @Override
-        public SeatBlockBehavior create(CustomBlock block, Map<String, Object> arguments) {
-            Vector3f offset = ResourceConfigUtils.getAsVector3f(arguments.getOrDefault("offset", "0,0,0"), "offset");
-            float yaw = ResourceConfigUtils.getAsFloat(arguments.getOrDefault("yaw", 0f), "yaw");
-            boolean limitPlayerRotation = ResourceConfigUtils.getAsBoolean(arguments.getOrDefault("limit-player-rotation", true), "limit-player-rotation");
-            return new SeatBlockBehavior(block, offset, yaw, limitPlayerRotation);
+        public SeatBlockBehavior create(CustomBlock block, ConfigSection section) {
+            return new SeatBlockBehavior(
+                    block,
+                    section.getVector3f("offset", ConfigConstants.ZERO_VECTOR3),
+                    section.getFloat("yaw"),
+                    section.getBoolean(LIMIT_PLAYER_ROTATION, true)
+            );
         }
     }
 }

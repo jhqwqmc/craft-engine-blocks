@@ -5,8 +5,7 @@ import net.momirealms.craftengine.core.block.behavior.BlockBehaviorFactory;
 import net.momirealms.craftengine.core.block.behavior.BlockBehaviorType;
 import net.momirealms.craftengine.core.block.entity.BlockEntity;
 import net.momirealms.craftengine.core.block.entity.BlockEntityType;
-import net.momirealms.craftengine.core.item.ItemProcessorFactory;
-import net.momirealms.craftengine.core.item.ItemSettings;
+import net.momirealms.craftengine.core.item.*;
 import net.momirealms.craftengine.core.item.processor.ItemProcessor;
 import net.momirealms.craftengine.core.item.processor.ItemProcessorType;
 import net.momirealms.craftengine.core.plugin.context.CommonFunctionType;
@@ -21,10 +20,10 @@ import net.momirealms.craftengine.core.util.ResourceKey;
 
 public class RegistryUtils {
 
-    public static <T extends BlockBehavior> BlockBehaviorType<T> registerBlockBehavior(Key key, BlockBehaviorFactory<T> factory) {
-        BlockBehaviorType<T> type = new BlockBehaviorType<>(key, factory);
+    public static <T extends BlockBehavior> BlockBehaviorType<T> registerBlockBehavior(Key id, BlockBehaviorFactory<T> factory) {
+        BlockBehaviorType<T> type = new BlockBehaviorType<>(id, factory);
         ((WritableRegistry<BlockBehaviorType<? extends BlockBehavior>>) BuiltInRegistries.BLOCK_BEHAVIOR_TYPE)
-                .register(ResourceKey.create(Registries.BLOCK_BEHAVIOR_TYPE.location(), key), type);
+                .register(ResourceKey.create(Registries.BLOCK_BEHAVIOR_TYPE.location(), id), type);
         return type;
     }
 
@@ -35,21 +34,24 @@ public class RegistryUtils {
         return type;
     }
 
-    public static <T extends Function<Context>> CommonFunctionType<T> registerEventFunction(Key key, FunctionFactory<Context, T> factory) {
-        CommonFunctionType<T> type = new CommonFunctionType<>(key, factory);
+    public static <T extends Function<Context>> CommonFunctionType<T> registerEventFunction(Key id, FunctionFactory<Context, T> factory) {
+        CommonFunctionType<T> type = new CommonFunctionType<>(id, factory);
         ((WritableRegistry<CommonFunctionType<?>>) BuiltInRegistries.COMMON_FUNCTION_TYPE)
-                .register(ResourceKey.create(Registries.COMMON_FUNCTION_TYPE.location(), key), type);
+                .register(ResourceKey.create(Registries.COMMON_FUNCTION_TYPE.location(), id), type);
         return type;
     }
 
-    public static void registerItemSetting(Key key, ItemSettings.Modifier.Factory factory) {
-        ItemSettings.Modifiers.registerFactory(key.asString(), factory);
+    public static <M extends ItemSettingsModifier> ItemSettingsModifierType<M> registerItemSetting(Key id, ItemSettingsModifierFactory<M> factory) {
+        ItemSettingsModifierType<M> type = new ItemSettingsModifierType<>(id, factory);
+        ((WritableRegistry<ItemSettingsModifierType<? extends ItemSettingsModifier>>) BuiltInRegistries.ITEM_SETTINGS_TYPE)
+                .register(ResourceKey.create(Registries.ITEM_SETTINGS_TYPE.location(), id), type);
+        return type;
     }
 
-    public static <T extends ItemProcessor> ItemProcessorType<T> registerItemProcessorType(Key key, ItemProcessorFactory<T> factory) {
-        ItemProcessorType<T> type = new ItemProcessorType<>(key, factory);
+    public static <T extends ItemProcessor> ItemProcessorType<T> registerItemProcessorType(Key id, ItemProcessorFactory<T> factory) {
+        ItemProcessorType<T> type = new ItemProcessorType<>(id, factory);
         ((WritableRegistry<ItemProcessorType<?>>) BuiltInRegistries.ITEM_PROCESSOR_TYPE)
-                .register(ResourceKey.create(Registries.ITEM_PROCESSOR_TYPE.location(), key), type);
+                .register(ResourceKey.create(Registries.ITEM_PROCESSOR_TYPE.location(), id), type);
         return type;
     }
 }

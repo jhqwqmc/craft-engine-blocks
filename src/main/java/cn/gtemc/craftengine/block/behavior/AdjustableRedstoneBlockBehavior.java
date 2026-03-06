@@ -2,18 +2,18 @@ package cn.gtemc.craftengine.block.behavior;
 
 import net.momirealms.craftengine.bukkit.block.BukkitBlockManager;
 import net.momirealms.craftengine.bukkit.block.behavior.BukkitBlockBehavior;
-import net.momirealms.craftengine.bukkit.nms.FastNMS;
 import net.momirealms.craftengine.bukkit.util.BlockStateUtils;
 import net.momirealms.craftengine.bukkit.util.LocationUtils;
 import net.momirealms.craftengine.core.block.CustomBlock;
 import net.momirealms.craftengine.core.block.ImmutableBlockState;
-import net.momirealms.craftengine.core.block.UpdateOption;
+import net.momirealms.craftengine.core.block.UpdateFlags;
 import net.momirealms.craftengine.core.block.behavior.BlockBehaviorFactory;
 import net.momirealms.craftengine.core.block.properties.IntegerProperty;
 import net.momirealms.craftengine.core.entity.player.InteractionResult;
+import net.momirealms.craftengine.core.plugin.config.ConfigSection;
 import net.momirealms.craftengine.core.world.context.UseOnContext;
+import net.momirealms.craftengine.proxy.minecraft.world.level.LevelWriterProxy;
 
-import java.util.Map;
 import java.util.concurrent.Callable;
 
 public class AdjustableRedstoneBlockBehavior extends BukkitBlockBehavior {
@@ -41,11 +41,11 @@ public class AdjustableRedstoneBlockBehavior extends BukkitBlockBehavior {
                 power++;
             }
         }
-        FastNMS.INSTANCE.method$LevelWriter$setBlock(
+        LevelWriterProxy.INSTANCE.setBlock(
                 context.getLevel().serverWorld(),
                 LocationUtils.toBlockPos(context.getClickedPos()),
                 state.with(this.powerProperty, power).customBlockState().literalObject(),
-                UpdateOption.UPDATE_ALL.flags()
+                UpdateFlags.UPDATE_ALL
         );
         return InteractionResult.SUCCESS_AND_CANCEL;
     }
@@ -74,12 +74,11 @@ public class AdjustableRedstoneBlockBehavior extends BukkitBlockBehavior {
     private static class Factory implements BlockBehaviorFactory<AdjustableRedstoneBlockBehavior> {
 
         @Override
-        public AdjustableRedstoneBlockBehavior create(CustomBlock block, Map<String, Object> arguments) {
-            IntegerProperty power = (IntegerProperty) block.getProperty("power");
-            if (power == null) {
-                throw new IllegalArgumentException("方块 '" + block.id() + "' 的 'gtemc:adjustable_redstone_block' 行为缺少必需的 'power' 属性");
-            }
-            return new AdjustableRedstoneBlockBehavior(block, power);
+        public AdjustableRedstoneBlockBehavior create(CustomBlock block, ConfigSection section) {
+            return new AdjustableRedstoneBlockBehavior(
+                    block,
+                    (IntegerProperty) BlockBehaviorFactory.getProperty(section.path(), block, "power", Integer.class)
+            );
         }
     }
 }

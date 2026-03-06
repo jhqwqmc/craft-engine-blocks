@@ -7,9 +7,9 @@ import net.momirealms.craftengine.core.item.Item;
 import net.momirealms.craftengine.core.item.ItemBuildContext;
 import net.momirealms.craftengine.core.item.ItemProcessorFactory;
 import net.momirealms.craftengine.core.item.processor.SimpleNetworkItemProcessor;
+import net.momirealms.craftengine.core.plugin.config.ConfigSection;
+import net.momirealms.craftengine.core.plugin.config.ConfigValue;
 import net.momirealms.craftengine.core.plugin.context.number.NumberProvider;
-import net.momirealms.craftengine.core.plugin.context.number.NumberProviders;
-import net.momirealms.craftengine.core.util.ResourceConfigUtils;
 import net.momirealms.craftengine.libraries.nbt.CompoundTag;
 
 import java.util.Map;
@@ -37,11 +37,11 @@ public final class RandomNumberProcessor implements SimpleNetworkItemProcessor {
     private static class Factory implements ItemProcessorFactory<RandomNumberProcessor> {
 
         @Override
-        public RandomNumberProcessor create(Object arg) {
-            Map<String, Object> data = ResourceConfigUtils.getAsMap(arg, "gtemc:random_number");
+        public RandomNumberProcessor create(ConfigValue value) {
+            ConfigSection section = value.getAsSection();
             Map<String, NumberProvider> numberProviders = new Object2ObjectOpenHashMap<>();
-            for (Map.Entry<String, Object> entry : data.entrySet()) {
-                numberProviders.put(entry.getKey(), NumberProviders.fromObject(entry.getValue()));
+            for (String key : section.keySet()) {
+                numberProviders.put(key, section.getNonNullNumber(key));
             }
             return new RandomNumberProcessor(numberProviders);
         }

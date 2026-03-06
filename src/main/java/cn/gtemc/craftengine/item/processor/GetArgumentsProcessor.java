@@ -10,8 +10,9 @@ import net.momirealms.craftengine.core.item.Item;
 import net.momirealms.craftengine.core.item.ItemBuildContext;
 import net.momirealms.craftengine.core.item.ItemProcessorFactory;
 import net.momirealms.craftengine.core.item.processor.SimpleNetworkItemProcessor;
+import net.momirealms.craftengine.core.plugin.config.ConfigSection;
+import net.momirealms.craftengine.core.plugin.config.ConfigValue;
 import net.momirealms.craftengine.core.plugin.context.ContextKey;
-import net.momirealms.craftengine.core.util.ResourceConfigUtils;
 import net.momirealms.craftengine.libraries.nbt.CompoundTag;
 import net.momirealms.craftengine.libraries.nbt.DoubleTag;
 import net.momirealms.craftengine.libraries.nbt.Tag;
@@ -64,10 +65,11 @@ public final class GetArgumentsProcessor implements SimpleNetworkItemProcessor {
     public static class Factory implements ItemProcessorFactory<GetArgumentsProcessor> {
 
         @Override
-        public GetArgumentsProcessor create(Object arg) {
-            Map<String, Object> args = ResourceConfigUtils.getAsMap(arg, "gtemc:get_arguments");
-            boolean attribute = ResourceConfigUtils.getAsBoolean(args.get("attribute"), "attribute");
-            return new GetArgumentsProcessor(attribute);
+        public GetArgumentsProcessor create(ConfigValue value) {
+            ConfigSection section = value.getAsSection();
+            return new GetArgumentsProcessor(
+                    section.getBoolean("attribute")
+            );
         }
     }
 }

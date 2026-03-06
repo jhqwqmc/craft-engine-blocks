@@ -3,21 +3,27 @@ package cn.gtemc.craftengine.item.settings;
 import net.momirealms.craftengine.core.attribute.AttributeModifier;
 import net.momirealms.craftengine.core.item.CustomItemSettingType;
 import net.momirealms.craftengine.core.item.ItemSettings;
+import net.momirealms.craftengine.core.item.ItemSettingsModifier;
+import net.momirealms.craftengine.core.item.ItemSettingsModifierFactory;
 import net.momirealms.craftengine.core.item.processor.AttributeModifiersProcessor;
+import net.momirealms.craftengine.core.plugin.config.ConfigSection;
+import net.momirealms.craftengine.core.plugin.config.ConfigValue;
 import net.momirealms.craftengine.core.plugin.context.CommonConditions;
-import net.momirealms.craftengine.core.plugin.context.Condition;
 import net.momirealms.craftengine.core.plugin.context.Context;
-import net.momirealms.craftengine.core.plugin.context.condition.AllOfCondition;
 import net.momirealms.craftengine.core.plugin.context.number.NumberProvider;
-import net.momirealms.craftengine.core.plugin.context.number.NumberProviders;
-import net.momirealms.craftengine.core.util.*;
+import net.momirealms.craftengine.core.util.Key;
+import net.momirealms.craftengine.core.util.MiscUtils;
+import net.momirealms.craftengine.core.util.VersionHelper;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
 
-public class AttributesSetting implements ItemSettings.Modifier {
+public class AttributesSetting implements ItemSettingsModifier {
     public static final CustomItemSettingType<List<AttributeData>> ATTRIBUTES = CustomItemSettingType.simple();
-    public static final Factory FACTORY = new Factory();
+    public static final ItemSettingsModifierFactory<AttributesSetting> FACTORY = new Factory();
     private final List<AttributeData> data;
 
     public AttributesSetting(List<AttributeData> data) {
@@ -29,39 +35,33 @@ public class AttributesSetting implements ItemSettings.Modifier {
         settings.addCustomData(ATTRIBUTES, this.data);
     }
 
-    public static class Factory implements ItemSettings.Modifier.Factory {
+    private static class Factory implements ItemSettingsModifierFactory<AttributesSetting> {
+        private static final String[] EXPIRY_TIME = new String[]{"expiry_time", "expiry-time"};
+        private static final String[] CONDITIONS = new String[] {"conditions", "condition"};
 
         @Override
-        public ItemSettings.Modifier createModifier(Object value) {
-            List<AttributeData> attributeData = ResourceConfigUtils.parseConfigAsList(value, (map) -> {
-                String type = ResourceConfigUtils.requireNonEmptyStringOrThrow(map.get("type"), "warning.config.item.data.attribute_modifiers.missing_type");
-                Key nativeType = AttributeModifiersProcessor.getNativeAttributeName(net.momirealms.craftengine.core.util.Key.of(type));
-                AttributeModifier.Slot slot = AttributeModifier.Slot.valueOf(map.getOrDefault("slot", "any").toString().toUpperCase(Locale.ENGLISH));
-                Key id = Key.of(ResourceConfigUtils.requireNonEmptyStringOrThrow(map.get("id"), "warning.config.item.data.attribute_modifiers.missing_id"));
-                NumberProvider amount = NumberProviders.fromObject(ResourceConfigUtils.requireNonNullOrThrow(map.get("amount"), "warning.config.item.data.attribute_modifiers.missing_amount"));
-                AttributeModifier.Operation operation = AttributeModifier.Operation.valueOf(
-                        ResourceConfigUtils.requireNonEmptyStringOrThrow(map.get("operation"), "warning.config.item.data.attribute_modifiers.missing_operation").toUpperCase(Locale.ENGLISH)
-                );
+        public AttributesSetting create(ConfigValue value) {
+            List<AttributeData> attributeData = value.getAsList(it -> {
+                ConfigSection section = it.getAsSection();
+                Key type = AttributeModifiersProcessor.getNativeAttributeName(section.getNonNullIdentifier("type"));
+                AttributeModifier.Slot slot = section.getNonNullEnum("slot", AttributeModifier.Slot.class);
+                Key id = section.getNonNullIdentifier("id");
+                NumberProvider amount = section.getNonNullNumber("amount");
+                AttributeModifier.Operation operation = section.getNonNullEnum("operation", AttributeModifier.Operation.class);
                 AttributeModifiersProcessor.PreModifier.PreDisplay display = null;
-                if (VersionHelper.isOrAbove1_21_6() && map.containsKey("display")) {
-                    Map<String, Object> displayMap = MiscUtils.castToMap(map.get("display"), false);
-                    AttributeModifier.Display.Type displayType = AttributeModifier.Display.Type.valueOf(ResourceConfigUtils.requireNonEmptyStringOrThrow(displayMap.get("type"), "warning.config.item.data.attribute_modifiers.display.missing_type").toUpperCase(Locale.ENGLISH));
+                if (VersionHelper.isOrAbove1_21_6() && section.containsKey("display")) {
+                    ConfigSection displayConfig = section.getNonNullSection("display");
+                    AttributeModifier.Display.Type displayType = displayConfig.getNonNullEnum("type", AttributeModifier.Display.Type.class);
                     if (displayType == AttributeModifier.Display.Type.OVERRIDE) {
-                        String miniMessageValue = ResourceConfigUtils.requireNonEmptyStringOrThrow(displayMap.get("value"), "warning.config.item.data.attribute_modifiers.display.missing_value");
+                        String miniMessageValue = displayConfig.getNonEmptyString("value");
                         display = new AttributeModifiersProcessor.PreModifier.PreDisplay(displayType, miniMessageValue);
                     } else {
                         display = new AttributeModifiersProcessor.PreModifier.PreDisplay(displayType, null);
                     }
                 }
-                AttributeModifiersProcessor.PreModifier preProcessor = new AttributeModifiersProcessor.PreModifier(nativeType.value(), slot, Optional.of(id), amount, operation, display);
-                Date expires = (Date) map.getOrDefault("expiry-time", null);
-                Condition<Context> conditions = null;
-                List<Condition<Context>> conditionList = ResourceConfigUtils.parseConfigAsList(map.get("conditions"), CommonConditions::fromMap);
-                if (conditionList.size() == 1) {
-                    conditions = conditionList.getFirst();
-                } else if (conditionList.size() > 1) {
-                    conditions = new AllOfCondition<>(conditionList);
-                }
+                AttributeModifiersProcessor.PreModifier preProcessor = new AttributeModifiersProcessor.PreModifier(type.value(), slot, Optional.of(id), amount, operation, display);
+                Date expires = section.getValue(EXPIRY_TIME, v -> v.is(Date.class) ? (Date) v.value() : null);
+                Predicate<Context> conditions = MiscUtils.allOf(section.getSectionList(CONDITIONS, CommonConditions::fromConfig));
                 return new AttributeData(preProcessor, expires, conditions);
             });
             return new AttributesSetting(attributeData);
@@ -71,6 +71,6 @@ public class AttributesSetting implements ItemSettings.Modifier {
     public record AttributeData(
             AttributeModifiersProcessor.PreModifier modifier,
             @Nullable Date expires,
-            @Nullable Condition<Context> conditions
+            @Nullable Predicate<Context> conditions
     ) {}
 }
