@@ -8,7 +8,7 @@ import net.momirealms.craftengine.core.world.World;
 import net.momirealms.craftengine.core.world.context.BlockPlaceContext;
 
 public class PlaceBlockBlockPlaceContext extends BlockPlaceContext {
-    public PlaceBlockBlockPlaceContext(World world, InteractionHand hand, Item<?> stack, BlockHitResult hit) {
+    public PlaceBlockBlockPlaceContext(World world, InteractionHand hand, Item stack, BlockHitResult hit) {
         super(world, null, hand, stack, hit);
     }
 

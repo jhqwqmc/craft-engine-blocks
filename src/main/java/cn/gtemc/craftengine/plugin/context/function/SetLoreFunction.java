@@ -39,7 +39,7 @@ public class SetLoreFunction<CTX extends Context> extends AbstractConditionalFun
     @Override
     protected void runInternal(CTX ctx) {
         for (Player player : this.selector.get(ctx)) {
-            Item<?> item = player.getItemInHand(this.hand.orElse(InteractionHand.MAIN_HAND));
+            Item item = player.getItemInHand(this.hand.orElse(InteractionHand.MAIN_HAND));
             if (ItemUtils.isEmpty(item)) continue;
             item.apply(this.itemProcessor, ItemBuildContext.of(player));
         }

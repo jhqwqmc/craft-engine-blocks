@@ -5,12 +5,12 @@ import cn.gtemc.craftengine.item.settings.AttributesSetting;
 import cn.gtemc.craftengine.plugin.context.RandomNumberContext;
 import io.papermc.paper.event.entity.EntityEquipmentChangedEvent;
 import net.kyori.adventure.key.Key;
+import net.momirealms.craftengine.bukkit.api.BukkitAdaptor;
+import net.momirealms.craftengine.bukkit.item.BukkitItem;
 import net.momirealms.craftengine.bukkit.item.BukkitItemManager;
-import net.momirealms.craftengine.bukkit.plugin.BukkitCraftEngine;
 import net.momirealms.craftengine.bukkit.plugin.user.BukkitServerPlayer;
 import net.momirealms.craftengine.bukkit.util.KeyUtils;
 import net.momirealms.craftengine.core.item.CustomItem;
-import net.momirealms.craftengine.core.item.Item;
 import net.momirealms.craftengine.core.plugin.Manageable;
 import org.bukkit.Bukkit;
 import org.bukkit.Registry;
@@ -45,8 +45,8 @@ public class ItemManager implements Manageable, Listener {
 
     @SuppressWarnings({"PatternValidation", "deprecation", "UnstableApiUsage"})
     private void removeAttributes(BukkitServerPlayer player, ItemStack itemStack, EquipmentSlot equipmentSlot) {
-        Item<ItemStack> item = BukkitItemManager.instance().wrap(itemStack);
-        CustomItem<ItemStack> customItem = item.getCustomItem().orElse(null);
+        BukkitItem item = BukkitItemManager.instance().wrap(itemStack);
+        CustomItem customItem = item.getCustomItem().orElse(null);
         if (customItem == null) {
             return;
         }
@@ -69,8 +69,8 @@ public class ItemManager implements Manageable, Listener {
 
     @SuppressWarnings({"PatternValidation", "deprecation", "UnstableApiUsage"})
     private void addAttributes(BukkitServerPlayer player, ItemStack itemStack, EquipmentSlot equipmentSlot) {
-        Item<ItemStack> item = BukkitItemManager.instance().wrap(itemStack);
-        CustomItem<ItemStack> customItem = item.getCustomItem().orElse(null);
+        BukkitItem item = BukkitItemManager.instance().wrap(itemStack);
+        CustomItem customItem = item.getCustomItem().orElse(null);
         if (customItem == null) {
             return;
         }
@@ -110,7 +110,7 @@ public class ItemManager implements Manageable, Listener {
         if (!(event.getEntity() instanceof Player bukkitPlayer)) {
             return;
         }
-        BukkitServerPlayer player = BukkitCraftEngine.instance().adapt(bukkitPlayer);
+        BukkitServerPlayer player = BukkitAdaptor.adapt(bukkitPlayer);
         if (player == null) {
             return;
         }

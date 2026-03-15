@@ -26,7 +26,7 @@ public record EnchantmentsLoreProcessor(Map<Key, String> descriptions) implement
     private static final Component SPLIT_COMPONENT = Component.text(" ");
 
     @Override
-    public <I> Item<I> apply(Item<I> item, ItemBuildContext context) {
+    public Item apply(Item item, ItemBuildContext context) {
         List<Enchantment> enchantments = item.enchantments().orElse(List.of());
         List<Component> lore = new ObjectArrayList<>();
         for (Enchantment enchantment : enchantments) {
@@ -54,17 +54,17 @@ public record EnchantmentsLoreProcessor(Map<Key, String> descriptions) implement
     }
 
     @Override
-    public <I> Key componentType(Item<I> item, ItemBuildContext context) {
+    public Key componentType(Item item, ItemBuildContext context) {
         return DataComponentKeys.LORE;
     }
 
     @Override
-    public <I> Object[] nbtPath(Item<I> item, ItemBuildContext context) {
+    public Object[] nbtPath(Item item, ItemBuildContext context) {
         return new Object[]{"display", "Lore"};
     }
 
     @Override
-    public <I> String nbtPathString(Item<I> item, ItemBuildContext context) {
+    public String nbtPathString(Item item, ItemBuildContext context) {
         return "display.Lore";
     }
 

@@ -6,6 +6,7 @@ import cn.gtemc.craftengine.util.PositionUtils;
 import cn.gtemc.craftengine.util.Reflections;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.momirealms.craftengine.bukkit.block.BukkitBlockManager;
+import net.momirealms.craftengine.bukkit.item.BukkitItem;
 import net.momirealms.craftengine.bukkit.item.BukkitItemManager;
 import net.momirealms.craftengine.bukkit.item.behavior.BlockItemBehavior;
 import net.momirealms.craftengine.bukkit.util.BlockStateUtils;
@@ -19,7 +20,6 @@ import net.momirealms.craftengine.core.block.properties.Property;
 import net.momirealms.craftengine.core.entity.player.InteractionHand;
 import net.momirealms.craftengine.core.entity.player.InteractionResult;
 import net.momirealms.craftengine.core.item.CustomItem;
-import net.momirealms.craftengine.core.item.Item;
 import net.momirealms.craftengine.core.item.behavior.ItemBehavior;
 import net.momirealms.craftengine.core.plugin.config.ConfigSection;
 import net.momirealms.craftengine.core.plugin.config.ConfigValue;
@@ -42,7 +42,6 @@ import net.momirealms.craftengine.proxy.minecraft.world.level.block.BlockProxy;
 import net.momirealms.craftengine.proxy.minecraft.world.level.block.state.BlockStateProxy;
 import net.momirealms.craftengine.proxy.minecraft.world.phys.BlockHitResultProxy;
 import net.momirealms.craftengine.proxy.minecraft.world.ticks.TickPriorityProxy;
-import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -199,10 +198,10 @@ public class PlaceBlockBehavior extends FacingTriggerableBlockBehavior {
                 }
             }
             if (!flag) {
-                Item<ItemStack> item = BukkitItemManager.instance().wrap(CraftItemStackProxy.INSTANCE.asCraftMirror(itemStack));
-                Optional<CustomItem<ItemStack>> optionalCustomItem = item.getCustomItem();
+                BukkitItem item = BukkitItemManager.instance().wrap(CraftItemStackProxy.INSTANCE.asCraftMirror(itemStack));
+                Optional<CustomItem> optionalCustomItem = item.getCustomItem();
                 if (optionalCustomItem.isPresent()) {
-                    CustomItem<ItemStack> customItem = optionalCustomItem.get();
+                    CustomItem customItem = optionalCustomItem.get();
                     for (ItemBehavior itemBehavior : customItem.behaviors()) {
                         if (itemBehavior instanceof BlockItemBehavior blockItemBehavior) {
                             if (!blockCheckByKey(blockItemBehavior.block())) continue;

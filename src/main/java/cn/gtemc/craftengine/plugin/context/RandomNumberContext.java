@@ -16,15 +16,15 @@ import java.util.Optional;
 
 public class RandomNumberContext extends PlayerOptionalContext {
     public static final String RANDOM_NUMBER_KEY = "gtemc:random_number";
-    private final Item<?> item;
+    private final Item item;
 
-    public RandomNumberContext(@Nullable Player player, @NotNull Item<?> item, @NotNull ContextHolder contexts) {
+    public RandomNumberContext(@Nullable Player player, @NotNull Item item, @NotNull ContextHolder contexts) {
         super(player, contexts);
         this.item = item;
     }
 
     @NotNull
-    public static RandomNumberContext of(@Nullable Player player, @NotNull Item<?> item) {
+    public static RandomNumberContext of(@Nullable Player player, @NotNull Item item) {
         return new RandomNumberContext(player, item, new ContextHolder(Map.of(DirectContextParameters.PLAYER, () -> player)));
     }
 

@@ -30,11 +30,11 @@ public final class GetArgumentsProcessor implements SimpleNetworkItemProcessor {
     }
 
     @Override
-    public <I> Item<I> prepareNetworkItem(Item<I> item, ItemBuildContext context, CompoundTag networkData) {
+    public Item prepareNetworkItem(Item item, ItemBuildContext context, CompoundTag networkData) {
         RandomNumberContext randomNumberContext = RandomNumberContext.of(context.player(), item);
         if (this.attribute) {
             List<AttributeModifier> attributeModifiers = new ObjectArrayList<>();
-            CustomItem<I> customItem = item.getCustomItem().orElse(null);
+            CustomItem customItem = item.getCustomItem().orElse(null);
             if (customItem != null) {
                 List<AttributesSetting.AttributeData> attributeDataList = customItem.settings().getCustomData(AttributesSetting.ATTRIBUTES);
                 for (AttributesSetting.AttributeData attributeData : attributeDataList) {
@@ -58,7 +58,7 @@ public final class GetArgumentsProcessor implements SimpleNetworkItemProcessor {
     }
 
     @Override
-    public <I> Item<I> apply(Item<I> item, ItemBuildContext context) {
+    public Item apply(Item item, ItemBuildContext context) {
         return item;
     }
 
