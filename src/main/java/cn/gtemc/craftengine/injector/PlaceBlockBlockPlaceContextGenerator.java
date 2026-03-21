@@ -74,15 +74,15 @@ public class PlaceBlockBlockPlaceContextGenerator {
             Object hitResult = UseOnContextProxy.INSTANCE.getHitResult(context);
             Object direction = BlockHitResultProxy.INSTANCE.getDirection(hitResult);
             Object directions = Array.newInstance(DirectionProxy.CLASS, DirectionProxy.VALUES.length);
-            Array.set(directions, 0, DirectionProxy.CLASS.cast(direction));
-            Array.set(directions, DirectionProxy.VALUES.length - 1, DirectionProxy.CLASS.cast(DirectionProxy.INSTANCE.getOpposite(direction)));
+            Array.set(directions, 0, direction);
+            Array.set(directions, DirectionProxy.VALUES.length - 1, DirectionProxy.INSTANCE.getOpposite(direction));
             int i = 0;
             for (Object direction1 : DirectionProxy.VALUES) {
                 if (direction1 != direction && direction1 != DirectionProxy.INSTANCE.getOpposite(direction)) {
-                    Array.set(directions, ++i, DirectionProxy.CLASS.cast(direction));
+                    Array.set(directions, ++i, direction);
                 }
             }
-            return (Object[]) DirectionProxy.CLASS.arrayType().cast(directions);
+            return (Object[]) directions;
         }
     }
 
