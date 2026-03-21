@@ -111,7 +111,6 @@ public class PlaceBlockBehavior extends FacingTriggerableBlockBehavior {
         return false;
     }
 
-    @SuppressWarnings("unchecked")
     public static List<Object> getContainersAt(Object level, BlockPos blockPos) {
         Object nmsBlockPos = LocationUtils.toBlockPos(blockPos);
         Object blockState = BlockGetterProxy.INSTANCE.getBlockState(level, nmsBlockPos);
