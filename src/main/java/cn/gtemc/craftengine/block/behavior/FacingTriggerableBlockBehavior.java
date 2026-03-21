@@ -1,7 +1,6 @@
 package cn.gtemc.craftengine.block.behavior;
 
 import cn.gtemc.craftengine.item.context.PlaceBlockBlockPlaceContext;
-import cn.gtemc.craftengine.util.Reflections;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.momirealms.craftengine.bukkit.block.BukkitBlockManager;
 import net.momirealms.craftengine.bukkit.block.behavior.BukkitBlockBehavior;
@@ -93,7 +92,7 @@ public abstract class FacingTriggerableBlockBehavior extends BukkitBlockBehavior
     }
 
     private Object[] orderedByNearest(Object entity) {
-        return (Object[]) Reflections.method$Direction$orderedByNearest.invoke(null, entity);
+        return DirectionProxy.INSTANCE.orderedByNearest(entity);
     }
 
     protected boolean blockCheckByBlockState(Object blockState) {

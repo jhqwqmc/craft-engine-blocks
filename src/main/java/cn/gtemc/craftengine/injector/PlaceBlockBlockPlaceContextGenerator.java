@@ -1,6 +1,5 @@
 package cn.gtemc.craftengine.injector;
 
-import cn.gtemc.craftengine.util.Reflections;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.ClassFileVersion;
 import net.bytebuddy.dynamic.DynamicType;
@@ -11,9 +10,13 @@ import net.bytebuddy.matcher.ElementMatchers;
 import net.momirealms.craftengine.libraries.reflection.clazz.SparrowClass;
 import net.momirealms.craftengine.libraries.reflection.constructor.SConstructor5;
 import net.momirealms.craftengine.libraries.reflection.constructor.matcher.ConstructorMatcher;
+import net.momirealms.craftengine.libraries.reflection.method.matcher.MethodMatcher;
 import net.momirealms.craftengine.proxy.minecraft.core.DirectionProxy;
+import net.momirealms.craftengine.proxy.minecraft.world.InteractionHandProxy;
 import net.momirealms.craftengine.proxy.minecraft.world.entity.player.PlayerProxy;
 import net.momirealms.craftengine.proxy.minecraft.world.item.ItemStackProxy;
+import net.momirealms.craftengine.proxy.minecraft.world.item.context.BlockPlaceContextProxy;
+import net.momirealms.craftengine.proxy.minecraft.world.item.context.UseOnContextProxy;
 import net.momirealms.craftengine.proxy.minecraft.world.level.LevelProxy;
 import net.momirealms.craftengine.proxy.minecraft.world.phys.BlockHitResultProxy;
 
@@ -25,20 +28,20 @@ public class PlaceBlockBlockPlaceContextGenerator {
     public static void init() {
         ByteBuddy byteBuddy = new ByteBuddy(ClassFileVersion.JAVA_V17);
         DynamicType.Builder<?> builder = byteBuddy
-                .subclass(Reflections.clazz$BlockPlaceContext)
+                .subclass(BlockPlaceContextProxy.CLASS)
                 .name("cn.gtemc.craftengine.injector.PlaceBlockBlockPlaceContext")
-                .method(ElementMatchers.is(Reflections.method$BlockPlaceContext$getNearestLookingDirection.method))
+                .method(ElementMatchers.is(SparrowClass.of(BlockPlaceContextProxy.CLASS).getDeclaredMethod(MethodMatcher.named("getNearestLookingDirection"))))
                 .intercept(MethodDelegation.to(DirectionHandler.INSTANCE))
-                .method(ElementMatchers.is(Reflections.method$BlockPlaceContext$getNearestLookingVerticalDirection.method))
+                .method(ElementMatchers.is(SparrowClass.of(BlockPlaceContextProxy.CLASS).getDeclaredMethod(MethodMatcher.named("getNearestLookingVerticalDirection"))))
                 .intercept(MethodDelegation.to(VerticalDirectionHandler.INSTANCE))
-                .method(ElementMatchers.is(Reflections.method$BlockPlaceContext$getNearestLookingDirections.method))
+                .method(ElementMatchers.is(SparrowClass.of(BlockPlaceContextProxy.CLASS).getDeclaredMethod(MethodMatcher.named("getNearestLookingDirections"))))
                 .intercept(MethodDelegation.to(DirectionsHandler.INSTANCE));
 
         SparrowClass<?> clazz = SparrowClass.of(builder.make()
                 .load(PlaceBlockBlockPlaceContextGenerator.class.getClassLoader())
                 .getLoaded());
         constructor$PlaceBlockBlockPlaceContext = clazz.getSparrowConstructor(ConstructorMatcher.takeArguments(
-                LevelProxy.CLASS, PlayerProxy.CLASS, Reflections.clazz$InteractionHand, ItemStackProxy.CLASS, BlockHitResultProxy.CLASS
+                LevelProxy.CLASS, PlayerProxy.CLASS, InteractionHandProxy.CLASS, ItemStackProxy.CLASS, BlockHitResultProxy.CLASS
         )).asm$5();
     }
 
@@ -47,7 +50,7 @@ public class PlaceBlockBlockPlaceContextGenerator {
 
         @RuntimeType
         public Object getNearestLookingDirection(@This Object context) {
-            Object hitResult = Reflections.method$UseOnContext$getHitResult.invoke(context);
+            Object hitResult = UseOnContextProxy.INSTANCE.getHitResult(context);
             return BlockHitResultProxy.INSTANCE.getDirection(hitResult);
         }
     }
@@ -57,8 +60,8 @@ public class PlaceBlockBlockPlaceContextGenerator {
 
         @RuntimeType
         public Object getNearestLookingVerticalDirection(@This Object context) {
-            Object hitResult = Reflections.method$UseOnContext$getHitResult.invoke(context);
-            Object direction = Reflections.method$BlockHitResult$getDirection.invoke(hitResult);
+            Object hitResult = UseOnContextProxy.INSTANCE.getHitResult(context);
+            Object direction = BlockHitResultProxy.INSTANCE.getDirection(hitResult);
             return direction == DirectionProxy.UP ? DirectionProxy.UP : DirectionProxy.DOWN;
         }
     }
@@ -68,8 +71,8 @@ public class PlaceBlockBlockPlaceContextGenerator {
 
         @RuntimeType
         public Object[] getNearestLookingDirections(@This Object context) {
-            Object hitResult = Reflections.method$UseOnContext$getHitResult.invoke(context);
-            Object direction = Reflections.method$BlockHitResult$getDirection.invoke(hitResult);
+            Object hitResult = UseOnContextProxy.INSTANCE.getHitResult(context);
+            Object direction = BlockHitResultProxy.INSTANCE.getDirection(hitResult);
             Object directions = Array.newInstance(DirectionProxy.CLASS, DirectionProxy.VALUES.length);
             Array.set(directions, 0, DirectionProxy.CLASS.cast(direction));
             Array.set(directions, DirectionProxy.VALUES.length - 1, DirectionProxy.CLASS.cast(DirectionProxy.INSTANCE.getOpposite(direction)));

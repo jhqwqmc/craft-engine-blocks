@@ -3,7 +3,6 @@ package cn.gtemc.craftengine.block.behavior;
 import cn.gtemc.craftengine.injector.PlaceBlockBlockPlaceContextGenerator;
 import cn.gtemc.craftengine.item.context.PlaceBlockBlockPlaceContext;
 import cn.gtemc.craftengine.util.PositionUtils;
-import cn.gtemc.craftengine.util.Reflections;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.momirealms.craftengine.bukkit.block.BukkitBlockManager;
 import net.momirealms.craftengine.bukkit.item.BukkitItem;
@@ -28,10 +27,10 @@ import net.momirealms.craftengine.core.util.Key;
 import net.momirealms.craftengine.core.world.BlockHitResult;
 import net.momirealms.craftengine.core.world.BlockPos;
 import net.momirealms.craftengine.proxy.bukkit.craftbukkit.inventory.CraftItemStackProxy;
-import net.momirealms.craftengine.proxy.minecraft.world.ContainerProxy;
-import net.momirealms.craftengine.proxy.minecraft.world.InteractionHandProxy;
-import net.momirealms.craftengine.proxy.minecraft.world.WorldlyContainerHolderProxy;
+import net.momirealms.craftengine.proxy.minecraft.world.*;
+import net.momirealms.craftengine.proxy.minecraft.world.entity.EntityProxy;
 import net.momirealms.craftengine.proxy.minecraft.world.entity.EntityTypeProxy;
+import net.momirealms.craftengine.proxy.minecraft.world.entity.item.ItemEntityProxy;
 import net.momirealms.craftengine.proxy.minecraft.world.item.BlockItemProxy;
 import net.momirealms.craftengine.proxy.minecraft.world.item.ItemStackProxy;
 import net.momirealms.craftengine.proxy.minecraft.world.level.BlockGetterProxy;
@@ -39,7 +38,11 @@ import net.momirealms.craftengine.proxy.minecraft.world.level.EntityGetterProxy;
 import net.momirealms.craftengine.proxy.minecraft.world.level.LevelProxy;
 import net.momirealms.craftengine.proxy.minecraft.world.level.LevelWriterProxy;
 import net.momirealms.craftengine.proxy.minecraft.world.level.block.BlockProxy;
+import net.momirealms.craftengine.proxy.minecraft.world.level.block.ChestBlockProxy;
+import net.momirealms.craftengine.proxy.minecraft.world.level.block.entity.ChestBlockEntityProxy;
+import net.momirealms.craftengine.proxy.minecraft.world.level.block.state.BlockBehaviourProxy;
 import net.momirealms.craftengine.proxy.minecraft.world.level.block.state.BlockStateProxy;
+import net.momirealms.craftengine.proxy.minecraft.world.phys.AABBProxy;
 import net.momirealms.craftengine.proxy.minecraft.world.phys.BlockHitResultProxy;
 import net.momirealms.craftengine.proxy.minecraft.world.ticks.TickPriorityProxy;
 
@@ -50,7 +53,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -62,8 +64,8 @@ public class PlaceBlockBehavior extends FacingTriggerableBlockBehavior {
     }
 
     private static IntStream getSlots(Object container, Object direction) {
-        if (Reflections.clazz$WorldlyContainer.isInstance(container)) {
-            return IntStream.of((int[]) Reflections.method$WorldlyContainer$getSlotsForFace.invoke(container, direction));
+        if (WorldlyContainerProxy.CLASS.isInstance(container)) {
+            return IntStream.of(WorldlyContainerProxy.INSTANCE.getSlotsForFace(container, direction));
         } else {
             return IntStream.range(0, ContainerProxy.INSTANCE.getContainerSize(container));
         }
@@ -73,13 +75,13 @@ public class PlaceBlockBehavior extends FacingTriggerableBlockBehavior {
     private static boolean getItemAndDoThings(Object level, BlockPos blockPos, Direction direction, Function<Object, Boolean> function) {
         for (Object container : getContainersAt(level, blockPos)) {
             boolean flag = getSlots(container, DirectionUtils.toNMSDirection(direction)).anyMatch(i -> {
-                Object itemStack = Reflections.method$Container$removeItem.invoke(container, i, 1);
+                Object itemStack = ContainerProxy.INSTANCE.removeItem(container, i, 1);
                 if (!ItemStackProxy.INSTANCE.isEmpty(itemStack)) {
-                    boolean flag1 = function.apply(Reflections.method$ItemStack$copy.invoke(itemStack));
+                    boolean flag1 = function.apply(ItemStackProxy.INSTANCE.copy(itemStack));
                     if (flag1) {
-                        Reflections.method$Container$setChanged.invoke(container);
+                        ContainerProxy.INSTANCE.setChanged(container);
                     } else {
-                        Reflections.method$Container$setItem.invoke(container, i, itemStack);
+                        ContainerProxy.INSTANCE.setItem(container, i, itemStack);
                     }
 
                     return true;
@@ -93,13 +95,13 @@ public class PlaceBlockBehavior extends FacingTriggerableBlockBehavior {
         }
         Object itemAt = getItemAt(level, LocationUtils.toBlockPos(blockPos));
         if (itemAt != null) {
-            Object item = Reflections.method$ItemEntity$getItem.invoke(itemAt);
+            Object item = ItemStackProxy.INSTANCE.getItem(itemAt);
             if (!ItemStackProxy.INSTANCE.isEmpty(item)) {
-                boolean flag = function.apply(Reflections.method$ItemStack$copyWithCount.invoke(item, 1));
+                boolean flag = function.apply(ItemStackProxy.INSTANCE.copyWithCount(item, 1));
                 if (flag) {
-                    Reflections.method$ItemStack$shrink.invoke(item, 1);
-                    if (((int) Reflections.method$ItemStack$getCount.invoke(item)) <= 0) {
-                        Reflections.method$Entity$discard.invoke(itemAt);
+                    ItemStackProxy.INSTANCE.shrink(item, 1);
+                    if (ItemStackProxy.INSTANCE.getCount(item) <= 0) {
+                        EntityProxy.INSTANCE.discard(itemAt);
                     }
                 }
 
@@ -115,28 +117,28 @@ public class PlaceBlockBehavior extends FacingTriggerableBlockBehavior {
         Object blockState = BlockGetterProxy.INSTANCE.getBlockState(level, nmsBlockPos);
         Object block = BlockStateProxy.INSTANCE.getBlock(blockState);
         if (WorldlyContainerHolderProxy.CLASS.isInstance(block)) {
-            Object container = Reflections.method$WorldlyContainerHolder$getContainer.invoke(block, blockState, level, nmsBlockPos);
+            Object container = WorldlyContainerHolderProxy.INSTANCE.getContainer(block, blockState, level, nmsBlockPos);
             if (container != null) {
                 return List.of(container);
             }
-        } else if ((boolean) Reflections.method$BlockStateBase$hasBlockEntity.invoke(blockState)) {
-            Object blockEntity = Reflections.method$BlockGetter$getBlockEntity.invoke(level, nmsBlockPos);
-            if (Reflections.clazz$Container.isInstance(blockEntity)) {
-                if (!(Reflections.clazz$ChestBlockEntity.isInstance(blockEntity)) || !(Reflections.clazz$ChestBlock.isInstance(block))) {
+        } else if (BlockBehaviourProxy.BlockStateBaseProxy.INSTANCE.hasBlockEntity(blockState)) {
+            Object blockEntity = BlockGetterProxy.INSTANCE.getBlockEntity(level, nmsBlockPos);
+            if (ContainerProxy.CLASS.isInstance(blockEntity)) {
+                if (!(ChestBlockEntityProxy.CLASS.isInstance(blockEntity)) || !(ChestBlockProxy.CLASS.isInstance(block))) {
                     return List.of(blockEntity);
                 }
-                Object container = Reflections.method$ChestBlock$getContainer.invoke(null, block, blockState, level, nmsBlockPos, true);
+                Object container = ChestBlockProxy.INSTANCE.getContainer(block, blockState, level, nmsBlockPos, true);
                 if (container != null) {
                     return List.of(container);
                 }
             }
         }
         List<Object> list = new ArrayList<>();
-        for (Object entity : (List<Object>) Reflections.method$EntityGetter$getEntities.invoke(
+        for (Object entity : EntityGetterProxy.INSTANCE.getEntities(
                 level, null, blockAABB(nmsBlockPos),
-                (Predicate<?>) entity -> Reflections.clazz$Container.isInstance(entity) && (boolean) Reflections.method$Entity$isAlive.invoke(entity)
+                entity -> ContainerProxy.CLASS.isInstance(entity) && EntityProxy.INSTANCE.isAlive(entity)
         )) {
-            if (Reflections.clazz$Container.isInstance(entity)) {
+            if (ContainerProxy.CLASS.isInstance(entity)) {
                 list.add(entity);
             }
         }
@@ -146,13 +148,13 @@ public class PlaceBlockBehavior extends FacingTriggerableBlockBehavior {
     @Nullable
     public static Object getItemAt(Object level, Object blockPos) {
         List<Object> entitiesOfClass = EntityGetterProxy.INSTANCE.getEntitiesOfClass(
-                level, Reflections.clazz$ItemEntity, blockAABB(blockPos), e -> (boolean) Reflections.method$Entity$isAlive.invoke(e)
+                level, ItemEntityProxy.CLASS, blockAABB(blockPos), EntityProxy.INSTANCE::isAlive
         );
         return entitiesOfClass.isEmpty() ? null : entitiesOfClass.getFirst();
     }
 
     private static Object blockAABB(Object blockPos) {
-        return Reflections.method$AABB$ofSize.invoke(null, PositionUtils.toVec3(PositionUtils.getCenter(LocationUtils.fromBlockPos(blockPos))), 0.9999999, 0.9999999, 0.9999999);
+        return AABBProxy.INSTANCE.ofSize(PositionUtils.toVec3(PositionUtils.getCenter(LocationUtils.fromBlockPos(blockPos))), 0.9999999, 0.9999999, 0.9999999);
     }
 
     @Override
@@ -193,8 +195,8 @@ public class PlaceBlockBehavior extends FacingTriggerableBlockBehavior {
                     Object placeBlockBlockPlaceContext = PlaceBlockBlockPlaceContextGenerator.create(
                             level, InteractionHandProxy.MAIN_HAND, itemStack, blockHitResult
                     );
-                    Object interactionResult = Reflections.method$BlockItem$place.invoke(itemStack1, placeBlockBlockPlaceContext);
-                    flag = (boolean) Reflections.method$InteractionResult$consumesAction.invoke(interactionResult);
+                    Object interactionResult = BlockItemProxy.INSTANCE.place(itemStack1, placeBlockBlockPlaceContext);
+                    flag = InteractionResultProxy.INSTANCE.consumesAction(interactionResult);
                 }
             }
             if (!flag) {
@@ -224,12 +226,12 @@ public class PlaceBlockBehavior extends FacingTriggerableBlockBehavior {
                         }
                     }
                 }
-                double d = ((float) Reflections.method$EntityType$getHeight.invoke(EntityTypeProxy.ITEM)) / 2.0;
+                double d = EntityTypeProxy.INSTANCE.getHeight(EntityTypeProxy.ITEM) / 2.0;
                 double d1 = blockPos1.x() + 0.5;
                 double d2 = blockPos1.y() + 0.5 - d;
                 double d3 = blockPos1.z() + 0.5;
-                Object itemEntity = Reflections.constructor$ItemEntity.newInstance(level, d1, d2, d3, itemStack);
-                Reflections.method$ItemEntity$setDefaultPickUpDelay.invoke(itemEntity);
+                Object itemEntity = ItemEntityProxy.INSTANCE.newInstance(level, d1, d2, d3, itemStack);
+                ItemEntityProxy.INSTANCE.setDefaultPickUpDelay(itemEntity);
                 LevelWriterProxy.INSTANCE.addFreshEntity(level, itemEntity, null);
             }
             return true;

@@ -13,7 +13,6 @@ import cn.gtemc.craftengine.item.ItemProcessors;
 import cn.gtemc.craftengine.item.settings.ItemSettings;
 import cn.gtemc.craftengine.plugin.context.event.EventFunctions;
 import cn.gtemc.craftengine.scheduler.JavaScheduler;
-import cn.gtemc.craftengine.util.Reflections;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Set;
@@ -55,7 +54,6 @@ public final class CraftEngineBlocks extends JavaPlugin {
         this.scheduler = new JavaScheduler(this);
         this.classPathAppender = new ReflectionClassPathAppender(this.getClass().getClassLoader());
         initDependencyManager();
-        Reflections.init();
         PlaceBlockBlockPlaceContextGenerator.init();
         BlockBehaviors.register();
         EventFunctions.register();
