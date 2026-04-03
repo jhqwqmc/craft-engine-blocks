@@ -115,9 +115,9 @@ public class SeatBlockEntityController extends BlockEntityController {
             }
             if (property.name().equals("facing_clockwise") && property.valueClass() == Direction.class) {
                 switch ((Direction) super.blockEntity.blockState.get(property)) {
-                    case NORTH, UP, DOWN -> sourceLocation.setYaw(90);
+                    case NORTH -> sourceLocation.setYaw(90);
                     case SOUTH -> sourceLocation.setYaw(270);
-                    case WEST -> sourceLocation.setYaw(0);
+                    case WEST, UP, DOWN -> sourceLocation.setYaw(0);
                     case EAST -> sourceLocation.setYaw(180);
                 }
                 break;
