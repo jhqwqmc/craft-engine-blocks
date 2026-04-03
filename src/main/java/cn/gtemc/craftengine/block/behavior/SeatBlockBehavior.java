@@ -1,33 +1,31 @@
 package cn.gtemc.craftengine.block.behavior;
 
-import cn.gtemc.craftengine.block.entity.BlockEntityTypes;
-import cn.gtemc.craftengine.block.entity.SeatBlockEntity;
+import cn.gtemc.craftengine.block.entity.SeatBlockEntityController;
 import net.momirealms.craftengine.bukkit.block.behavior.BukkitBlockBehavior;
 import net.momirealms.craftengine.bukkit.plugin.user.BukkitServerPlayer;
-import net.momirealms.craftengine.core.block.CustomBlock;
+import net.momirealms.craftengine.core.block.BlockDefinition;
 import net.momirealms.craftengine.core.block.ImmutableBlockState;
 import net.momirealms.craftengine.core.block.behavior.BlockBehaviorFactory;
 import net.momirealms.craftengine.core.block.behavior.EntityBlockBehavior;
 import net.momirealms.craftengine.core.block.entity.BlockEntity;
-import net.momirealms.craftengine.core.block.entity.BlockEntityType;
+import net.momirealms.craftengine.core.block.entity.BlockEntityController;
 import net.momirealms.craftengine.core.entity.player.InteractionResult;
 import net.momirealms.craftengine.core.plugin.config.ConfigConstants;
 import net.momirealms.craftengine.core.plugin.config.ConfigSection;
-import net.momirealms.craftengine.core.world.BlockPos;
 import net.momirealms.craftengine.core.world.CEWorld;
 import net.momirealms.craftengine.core.world.context.UseOnContext;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 @SuppressWarnings("UnstableApiUsage")
 public class SeatBlockBehavior extends BukkitBlockBehavior implements EntityBlockBehavior {
     public static final BlockBehaviorFactory<SeatBlockBehavior> FACTORY = new Factory();
-    private final Vector3f offset;
-    private final float yaw;
-    private final boolean limitPlayerRotation;
+    public final Vector3f offset;
+    public final float yaw;
+    public final boolean limitPlayerRotation;
+    private int controllerId;
 
-    public SeatBlockBehavior(CustomBlock customBlock, Vector3f offset, float yaw, boolean limitPlayerRotation) {
-        super(customBlock);
+    public SeatBlockBehavior(BlockDefinition blockDefinition, Vector3f offset, float yaw, boolean limitPlayerRotation) {
+        super(blockDefinition);
         this.offset = offset;
         this.yaw = yaw;
         this.limitPlayerRotation = limitPlayerRotation;
@@ -42,28 +40,23 @@ public class SeatBlockBehavior extends BukkitBlockBehavior implements EntityBloc
         player.swingHand(context.getHand());
         CEWorld world = context.getLevel().storageWorld();
         BlockEntity blockEntity = world.getBlockEntityAtIfLoaded(context.getClickedPos());
-        if (!(blockEntity instanceof SeatBlockEntity seatBlockEntity)) {
-            return InteractionResult.PASS;
-        }
-        seatBlockEntity.seat(player.platformPlayer());
+        if (blockEntity == null) return InteractionResult.PASS;
+        SeatBlockEntityController controller = blockEntity.controller.get(SeatBlockEntityController.class, this.controllerId);
+        controller.seat(player.platformPlayer());
         return InteractionResult.SUCCESS_AND_CANCEL;
     }
 
     @Override
-    public @Nullable <T extends BlockEntity> BlockEntityType<T> blockEntityType(ImmutableBlockState immutableBlockState) {
-        return EntityBlockBehavior.blockEntityTypeHelper(BlockEntityTypes.SEAT);
-    }
-
-    @Override
-    public BlockEntity createBlockEntity(BlockPos pos, ImmutableBlockState state) {
-        return new SeatBlockEntity(pos, state, this.offset, this.yaw, this.limitPlayerRotation);
+    public BlockEntityController createController(BlockEntity blockEntity, int controllerId) {
+        this.controllerId = controllerId;
+        return new SeatBlockEntityController(blockEntity, this);
     }
 
     private static class Factory implements BlockBehaviorFactory<SeatBlockBehavior> {
         private static final String[] LIMIT_PLAYER_ROTATION = new String[]{"limit_player_rotation", "limit-player-rotation"};
 
         @Override
-        public SeatBlockBehavior create(CustomBlock block, ConfigSection section) {
+        public SeatBlockBehavior create(BlockDefinition block, ConfigSection section) {
             return new SeatBlockBehavior(
                     block,
                     section.getVector3f("offset", ConfigConstants.ZERO_VECTOR3),

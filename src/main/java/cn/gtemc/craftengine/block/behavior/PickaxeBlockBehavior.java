@@ -4,7 +4,7 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.momirealms.craftengine.bukkit.block.BukkitBlockManager;
 import net.momirealms.craftengine.bukkit.util.BlockStateUtils;
 import net.momirealms.craftengine.bukkit.util.DirectionUtils;
-import net.momirealms.craftengine.core.block.CustomBlock;
+import net.momirealms.craftengine.core.block.BlockDefinition;
 import net.momirealms.craftengine.core.block.ImmutableBlockState;
 import net.momirealms.craftengine.core.block.behavior.BlockBehaviorFactory;
 import net.momirealms.craftengine.core.block.properties.Property;
@@ -24,8 +24,8 @@ import java.util.stream.Collectors;
 public class PickaxeBlockBehavior extends FacingTriggerableBlockBehavior {
     public static final BlockBehaviorFactory<PickaxeBlockBehavior> FACTORY = new Factory();
 
-    public PickaxeBlockBehavior(CustomBlock customBlock, Property<Direction> facing, Property<Boolean> triggered, Set<Key> blocks, boolean whitelistMode) {
-        super(customBlock, facing, triggered, blocks, whitelistMode);
+    public PickaxeBlockBehavior(BlockDefinition blockDefinition, Property<Direction> facing, Property<Boolean> triggered, Set<Key> blocks, boolean whitelistMode) {
+        super(blockDefinition, facing, triggered, blocks, whitelistMode);
     }
 
     @Override
@@ -55,7 +55,7 @@ public class PickaxeBlockBehavior extends FacingTriggerableBlockBehavior {
     private static class Factory implements BlockBehaviorFactory<PickaxeBlockBehavior> {
 
         @Override
-        public PickaxeBlockBehavior create(CustomBlock block, ConfigSection section) {
+        public PickaxeBlockBehavior create(BlockDefinition block, ConfigSection section) {
             boolean whitelistMode = section.getBoolean("whitelist");
             Set<Key> blocks = section.getList("blocks", ConfigValue::getAsIdentifier).stream().collect(Collectors.toCollection(ObjectOpenHashSet::new));
             if (blocks.isEmpty() && !whitelistMode) {

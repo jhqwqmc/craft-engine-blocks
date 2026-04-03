@@ -1,15 +1,15 @@
 package cn.gtemc.craftengine.block.entity;
 
+import cn.gtemc.craftengine.block.behavior.SeatBlockBehavior;
 import cn.gtemc.craftengine.util.LegacyAttributeUtils;
 import net.momirealms.craftengine.bukkit.util.EntityUtils;
-import net.momirealms.craftengine.core.block.ImmutableBlockState;
 import net.momirealms.craftengine.core.block.entity.BlockEntity;
+import net.momirealms.craftengine.core.block.entity.BlockEntityController;
 import net.momirealms.craftengine.core.block.properties.IntegerProperty;
 import net.momirealms.craftengine.core.block.properties.Property;
-import net.momirealms.craftengine.core.util.HorizontalDirection;
+import net.momirealms.craftengine.core.util.Direction;
 import net.momirealms.craftengine.core.util.QuaternionUtils;
 import net.momirealms.craftengine.core.util.VersionHelper;
-import net.momirealms.craftengine.core.world.BlockPos;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
@@ -22,23 +22,19 @@ import org.joml.Vector3f;
 import java.lang.ref.WeakReference;
 import java.util.Objects;
 
-public class SeatBlockEntity extends BlockEntity {
+public class SeatBlockEntityController extends BlockEntityController {
     public static final NamespacedKey SEAT_KEY = new NamespacedKey("gtemc", "seat");
     @Nullable
     private WeakReference<Entity> seatEntity;
-    private final Vector3f offset;
-    private final float yaw;
-    private final boolean limitPlayerRotation;
+    private final SeatBlockBehavior behavior;
 
-    public SeatBlockEntity(BlockPos pos, ImmutableBlockState blockState, Vector3f offset, float yaw, boolean limitPlayerRotation) {
-        super(BlockEntityTypes.SEAT, pos, blockState);
-        this.offset = offset;
-        this.yaw = yaw;
-        this.limitPlayerRotation = limitPlayerRotation;
+    public SeatBlockEntityController(BlockEntity blockEntity, SeatBlockBehavior behavior) {
+        super(blockEntity);
+        this.behavior = behavior;
     }
 
     @Override
-    public void preRemove() {
+    public void onRemove() {
         Entity entity = seatEntity();
         if (entity != null) entity.remove();
     }
@@ -68,8 +64,8 @@ public class SeatBlockEntity extends BlockEntity {
 
     private void spawnSeat(Player player) {
         destroy();
-        Location location = calculateSeatLocation(new Location(player.getWorld(), super.pos.x() + 0.5, super.pos.y(), super.pos.z() + 0.5, 0, 0));
-        Entity seatEntity = limitPlayerRotation ?
+        Location location = calculateSeatLocation(new Location(player.getWorld(), super.blockEntity.pos.x() + 0.5, super.blockEntity.pos.y(), super.blockEntity.pos.z() + 0.5, 0, 0));
+        Entity seatEntity = this.behavior.limitPlayerRotation ?
                 EntityUtils.spawnEntity(player.getWorld(),
                         VersionHelper.isOrAbove1_20_2() ? location.subtract(0, 0.9875, 0) : location.subtract(0, 0.990625, 0),
                         EntityType.ARMOR_STAND,
@@ -107,19 +103,19 @@ public class SeatBlockEntity extends BlockEntity {
     }
 
     private Location calculateSeatLocation(Location sourceLocation) {
-        for (Property<?> property : super.blockState.getProperties()) {
-            if (property.name().equals("facing") && property.valueClass() == HorizontalDirection.class) {
-                switch ((HorizontalDirection) super.blockState.get(property)) {
-                    case NORTH -> sourceLocation.setYaw(0);
+        for (Property<?> property : super.blockEntity.blockState.getProperties()) {
+            if (property.name().equals("facing") && property.valueClass() == Direction.class) {
+                switch ((Direction) super.blockEntity.blockState.get(property)) {
+                    case NORTH, UP, DOWN -> sourceLocation.setYaw(0);
                     case SOUTH -> sourceLocation.setYaw(180);
                     case WEST -> sourceLocation.setYaw(270);
                     case EAST -> sourceLocation.setYaw(90);
                 }
                 break;
             }
-            if (property.name().equals("facing_clockwise") && property.valueClass() == HorizontalDirection.class) {
-                switch ((HorizontalDirection) super.blockState.get(property)) {
-                    case NORTH -> sourceLocation.setYaw(90);
+            if (property.name().equals("facing_clockwise") && property.valueClass() == Direction.class) {
+                switch ((Direction) super.blockEntity.blockState.get(property)) {
+                    case NORTH, UP, DOWN -> sourceLocation.setYaw(90);
                     case SOUTH -> sourceLocation.setYaw(270);
                     case WEST -> sourceLocation.setYaw(0);
                     case EAST -> sourceLocation.setYaw(180);
@@ -130,12 +126,12 @@ public class SeatBlockEntity extends BlockEntity {
                 IntegerProperty rotation = (IntegerProperty) property;
                 int min = rotation.min;
                 int max = rotation.max;
-                int current = (Integer) super.blockState.get(property);
+                int current = (Integer) super.blockEntity.blockState.get(property);
                 sourceLocation.setYaw((float) ((current - min) * 360) / (max - min));
             }
         }
-        Vector3f offset = QuaternionUtils.toQuaternionf(0, Math.toRadians(180 - sourceLocation.getYaw()), 0).conjugate().transform(new Vector3f(this.offset));
-        double yaw = this.yaw + sourceLocation.getYaw();
+        Vector3f offset = QuaternionUtils.toQuaternionf(0, Math.toRadians(180 - sourceLocation.getYaw()), 0).conjugate().transform(new Vector3f(this.behavior.offset));
+        double yaw = this.behavior.yaw + sourceLocation.getYaw();
         if (yaw < -180) yaw += 360;
         Location newLocation = sourceLocation.clone();
         newLocation.setYaw((float) yaw);

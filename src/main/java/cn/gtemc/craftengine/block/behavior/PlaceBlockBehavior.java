@@ -12,13 +12,13 @@ import net.momirealms.craftengine.bukkit.util.BlockStateUtils;
 import net.momirealms.craftengine.bukkit.util.DirectionUtils;
 import net.momirealms.craftengine.bukkit.util.LocationUtils;
 import net.momirealms.craftengine.bukkit.world.BukkitWorldManager;
-import net.momirealms.craftengine.core.block.CustomBlock;
+import net.momirealms.craftengine.core.block.BlockDefinition;
 import net.momirealms.craftengine.core.block.ImmutableBlockState;
 import net.momirealms.craftengine.core.block.behavior.BlockBehaviorFactory;
 import net.momirealms.craftengine.core.block.properties.Property;
 import net.momirealms.craftengine.core.entity.player.InteractionHand;
 import net.momirealms.craftengine.core.entity.player.InteractionResult;
-import net.momirealms.craftengine.core.item.CustomItem;
+import net.momirealms.craftengine.core.item.ItemDefinition;
 import net.momirealms.craftengine.core.item.behavior.ItemBehavior;
 import net.momirealms.craftengine.core.plugin.config.ConfigSection;
 import net.momirealms.craftengine.core.plugin.config.ConfigValue;
@@ -59,8 +59,8 @@ import java.util.stream.IntStream;
 public class PlaceBlockBehavior extends FacingTriggerableBlockBehavior {
     public static final BlockBehaviorFactory<PlaceBlockBehavior> FACTORY = new Factory();
 
-    public PlaceBlockBehavior(CustomBlock customBlock, Property<Direction> facing, Property<Boolean> triggered, Set<Key> blocks, boolean whitelistMode) {
-        super(customBlock, facing, triggered, blocks, whitelistMode);
+    public PlaceBlockBehavior(BlockDefinition blockDefinition, Property<Direction> facing, Property<Boolean> triggered, Set<Key> blocks, boolean whitelistMode) {
+        super(blockDefinition, facing, triggered, blocks, whitelistMode);
     }
 
     private static IntStream getSlots(Object container, Object direction) {
@@ -200,10 +200,10 @@ public class PlaceBlockBehavior extends FacingTriggerableBlockBehavior {
             }
             if (!flag) {
                 BukkitItem item = BukkitItemManager.instance().wrap(CraftItemStackProxy.INSTANCE.asCraftMirror(itemStack));
-                Optional<CustomItem> optionalCustomItem = item.getCustomItem();
+                Optional<ItemDefinition> optionalCustomItem = item.getCustomItem();
                 if (optionalCustomItem.isPresent()) {
-                    CustomItem customItem = optionalCustomItem.get();
-                    for (ItemBehavior itemBehavior : customItem.behaviors()) {
+                    ItemDefinition itemDefinition = optionalCustomItem.get();
+                    for (ItemBehavior itemBehavior : itemDefinition.behaviors()) {
                         if (itemBehavior instanceof BlockItemBehavior blockItemBehavior) {
                             if (!blockCheckByKey(blockItemBehavior.block())) continue;
                             BlockHitResult hitResult = new BlockHitResult(
@@ -241,7 +241,7 @@ public class PlaceBlockBehavior extends FacingTriggerableBlockBehavior {
     private static class Factory implements BlockBehaviorFactory<PlaceBlockBehavior> {
 
         @Override
-        public PlaceBlockBehavior create(CustomBlock block, ConfigSection section) {
+        public PlaceBlockBehavior create(BlockDefinition block, ConfigSection section) {
             boolean whitelistMode = section.getBoolean("whitelist");
             Set<Key> blocks = section.getList("blocks", ConfigValue::getAsIdentifier).stream().collect(Collectors.toCollection(ObjectOpenHashSet::new));
             if (blocks.isEmpty() && !whitelistMode) {

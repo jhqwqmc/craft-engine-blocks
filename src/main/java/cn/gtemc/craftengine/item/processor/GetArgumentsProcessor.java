@@ -5,9 +5,9 @@ import cn.gtemc.craftengine.plugin.context.RandomNumberContext;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.momirealms.craftengine.bukkit.item.DataComponentTypes;
 import net.momirealms.craftengine.core.attribute.AttributeModifier;
-import net.momirealms.craftengine.core.item.CustomItem;
 import net.momirealms.craftengine.core.item.Item;
 import net.momirealms.craftengine.core.item.ItemBuildContext;
+import net.momirealms.craftengine.core.item.ItemDefinition;
 import net.momirealms.craftengine.core.item.ItemProcessorFactory;
 import net.momirealms.craftengine.core.item.processor.SimpleNetworkItemProcessor;
 import net.momirealms.craftengine.core.plugin.config.ConfigSection;
@@ -34,9 +34,9 @@ public final class GetArgumentsProcessor implements SimpleNetworkItemProcessor {
         RandomNumberContext randomNumberContext = RandomNumberContext.of(context.player(), item);
         if (this.attribute) {
             List<AttributeModifier> attributeModifiers = new ObjectArrayList<>();
-            CustomItem customItem = item.getCustomItem().orElse(null);
-            if (customItem != null) {
-                List<AttributesSetting.AttributeData> attributeDataList = customItem.settings().getCustomData(AttributesSetting.ATTRIBUTES);
+            ItemDefinition itemDefinition = item.getCustomItem().orElse(null);
+            if (itemDefinition != null) {
+                List<AttributesSetting.AttributeData> attributeDataList = itemDefinition.settings().getCustomData(AttributesSetting.ATTRIBUTES);
                 for (AttributesSetting.AttributeData attributeData : attributeDataList) {
                     if (attributeData.expires() != null && attributeData.expires().before(new Date())) continue; // 过期不管
                     if (attributeData.conditions() != null && !attributeData.conditions().test(randomNumberContext)) continue; // 不符合条件不管

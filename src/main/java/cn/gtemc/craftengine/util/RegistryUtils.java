@@ -30,13 +30,6 @@ public class RegistryUtils {
         return type;
     }
 
-    public static <T extends BlockEntity> BlockEntityType<T> registerBlockEntity(Key id) {
-        BlockEntityType<T> type = new BlockEntityType<>(id);
-        ((WritableRegistry<BlockEntityType<? extends BlockEntity>>) BuiltInRegistries.BLOCK_ENTITY_TYPE)
-                .register(ResourceKey.create(Registries.BLOCK_ENTITY_TYPE.location(), id), type);
-        return type;
-    }
-
     public static <T extends Function<Context>> CommonFunctionType<T> registerEventFunction(Key id, FunctionFactory<Context, T> factory) {
         CommonFunctionType<T> type = new CommonFunctionType<>(id, factory);
         ((WritableRegistry<CommonFunctionType<?>>) BuiltInRegistries.COMMON_FUNCTION_TYPE)

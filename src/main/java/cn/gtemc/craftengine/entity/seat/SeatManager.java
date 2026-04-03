@@ -19,7 +19,7 @@ import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.jetbrains.annotations.NotNull;
 
-import static cn.gtemc.craftengine.block.entity.SeatBlockEntity.SEAT_KEY;
+import static cn.gtemc.craftengine.block.entity.SeatBlockEntityController.SEAT_KEY;
 
 public class SeatManager implements Manageable, Listener {
     private final CraftEngineBlocks plugin;

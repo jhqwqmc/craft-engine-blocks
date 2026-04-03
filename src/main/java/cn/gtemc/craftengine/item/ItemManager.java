@@ -10,7 +10,7 @@ import net.momirealms.craftengine.bukkit.item.BukkitItem;
 import net.momirealms.craftengine.bukkit.item.BukkitItemManager;
 import net.momirealms.craftengine.bukkit.plugin.user.BukkitServerPlayer;
 import net.momirealms.craftengine.bukkit.util.KeyUtils;
-import net.momirealms.craftengine.core.item.CustomItem;
+import net.momirealms.craftengine.core.item.ItemDefinition;
 import net.momirealms.craftengine.core.plugin.Manageable;
 import org.bukkit.Bukkit;
 import org.bukkit.Registry;
@@ -46,11 +46,11 @@ public class ItemManager implements Manageable, Listener {
     @SuppressWarnings({"PatternValidation", "deprecation", "UnstableApiUsage"})
     private void removeAttributes(BukkitServerPlayer player, ItemStack itemStack, EquipmentSlot equipmentSlot) {
         BukkitItem item = BukkitItemManager.instance().wrap(itemStack);
-        CustomItem customItem = item.getCustomItem().orElse(null);
-        if (customItem == null) {
+        ItemDefinition itemDefinition = item.getCustomItem().orElse(null);
+        if (itemDefinition == null) {
             return;
         }
-        List<AttributesSetting.AttributeData> data = customItem.settings().getCustomData(AttributesSetting.ATTRIBUTES);
+        List<AttributesSetting.AttributeData> data = itemDefinition.settings().getCustomData(AttributesSetting.ATTRIBUTES);
         if (data == null || data.isEmpty()) {
             return;
         }
@@ -70,12 +70,12 @@ public class ItemManager implements Manageable, Listener {
     @SuppressWarnings({"PatternValidation", "deprecation", "UnstableApiUsage"})
     private void addAttributes(BukkitServerPlayer player, ItemStack itemStack, EquipmentSlot equipmentSlot) {
         BukkitItem item = BukkitItemManager.instance().wrap(itemStack);
-        CustomItem customItem = item.getCustomItem().orElse(null);
-        if (customItem == null) {
+        ItemDefinition itemDefinition = item.getCustomItem().orElse(null);
+        if (itemDefinition == null) {
             return;
         }
         RandomNumberContext context = RandomNumberContext.of(player, item);
-        List<AttributesSetting.AttributeData> data = customItem.settings().getCustomData(AttributesSetting.ATTRIBUTES);
+        List<AttributesSetting.AttributeData> data = itemDefinition.settings().getCustomData(AttributesSetting.ATTRIBUTES);
         if (data == null || data.isEmpty()) {
             return;
         }

@@ -7,7 +7,7 @@ import net.momirealms.craftengine.bukkit.block.behavior.BukkitBlockBehavior;
 import net.momirealms.craftengine.bukkit.util.BlockStateUtils;
 import net.momirealms.craftengine.bukkit.util.DirectionUtils;
 import net.momirealms.craftengine.bukkit.util.KeyUtils;
-import net.momirealms.craftengine.core.block.CustomBlock;
+import net.momirealms.craftengine.core.block.BlockDefinition;
 import net.momirealms.craftengine.core.block.ImmutableBlockState;
 import net.momirealms.craftengine.core.block.UpdateFlags;
 import net.momirealms.craftengine.core.block.properties.Property;
@@ -52,8 +52,8 @@ public abstract class FacingTriggerableBlockBehavior extends BukkitBlockBehavior
     protected final Set<Key> blocks;
     protected final boolean whitelistMode;
 
-    public FacingTriggerableBlockBehavior(CustomBlock customBlock, Property<Direction> facing, Property<Boolean> triggered, Set<Key> blocks, boolean whitelistMode) {
-        super(customBlock);
+    public FacingTriggerableBlockBehavior(BlockDefinition blockDefinition, Property<Direction> facing, Property<Boolean> triggered, Set<Key> blocks, boolean whitelistMode) {
+        super(blockDefinition);
         this.facingProperty = facing;
         this.triggeredProperty = triggered;
         this.blocks = blocks;

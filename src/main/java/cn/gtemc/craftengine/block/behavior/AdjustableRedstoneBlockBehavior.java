@@ -4,7 +4,7 @@ import net.momirealms.craftengine.bukkit.block.BukkitBlockManager;
 import net.momirealms.craftengine.bukkit.block.behavior.BukkitBlockBehavior;
 import net.momirealms.craftengine.bukkit.util.BlockStateUtils;
 import net.momirealms.craftengine.bukkit.util.LocationUtils;
-import net.momirealms.craftengine.core.block.CustomBlock;
+import net.momirealms.craftengine.core.block.BlockDefinition;
 import net.momirealms.craftengine.core.block.ImmutableBlockState;
 import net.momirealms.craftengine.core.block.UpdateFlags;
 import net.momirealms.craftengine.core.block.behavior.BlockBehaviorFactory;
@@ -20,8 +20,8 @@ public class AdjustableRedstoneBlockBehavior extends BukkitBlockBehavior {
     public static final BlockBehaviorFactory<AdjustableRedstoneBlockBehavior> FACTORY = new Factory();
     private final IntegerProperty powerProperty;
 
-    public AdjustableRedstoneBlockBehavior(CustomBlock customBlock, IntegerProperty power) {
-        super(customBlock);
+    public AdjustableRedstoneBlockBehavior(BlockDefinition blockDefinition, IntegerProperty power) {
+        super(blockDefinition);
         this.powerProperty = power;
     }
 
@@ -74,7 +74,7 @@ public class AdjustableRedstoneBlockBehavior extends BukkitBlockBehavior {
     private static class Factory implements BlockBehaviorFactory<AdjustableRedstoneBlockBehavior> {
 
         @Override
-        public AdjustableRedstoneBlockBehavior create(CustomBlock block, ConfigSection section) {
+        public AdjustableRedstoneBlockBehavior create(BlockDefinition block, ConfigSection section) {
             return new AdjustableRedstoneBlockBehavior(
                     block,
                     (IntegerProperty) BlockBehaviorFactory.getProperty(section.path(), block, "power", Integer.class)
