@@ -42,9 +42,9 @@ public class AdjustableRedstoneBlockBehavior extends BukkitBlockBehavior {
             }
         }
         LevelWriterProxy.INSTANCE.setBlock(
-                context.getLevel().serverWorld(),
+                context.getLevel().minecraftWorld(),
                 LocationUtils.toBlockPos(context.getClickedPos()),
-                state.with(this.powerProperty, power).customBlockState().literalObject(),
+                state.with(this.powerProperty, power).customBlockState().minecraftState(),
                 UpdateFlags.UPDATE_ALL
         );
         return InteractionResult.SUCCESS_AND_CANCEL;

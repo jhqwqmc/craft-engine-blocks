@@ -70,11 +70,11 @@ public abstract class FacingTriggerableBlockBehavior extends BukkitBlockBehavior
         if (blockState == null || blockState.isEmpty()) return;
         boolean triggeredValue = blockState.get(this.triggeredProperty);
         if (hasNeighborSignal && !triggeredValue) {
-            Object tickState = blockState.with(this.triggeredProperty, true).customBlockState().literalObject();
+            Object tickState = blockState.with(this.triggeredProperty, true).customBlockState().minecraftState();
             LevelWriterProxy.INSTANCE.setBlock(level, pos, tickState, UpdateFlags.UPDATE_CLIENTS);
             ScheduledTickAccessProxy.INSTANCE.scheduleTick$0(level, pos, BlockStateUtils.getBlockOwner(tickState), 1, this.getTickPriority());
         } else if (!hasNeighborSignal && triggeredValue) {
-            LevelWriterProxy.INSTANCE.setBlock(level, pos, blockState.with(this.triggeredProperty, false).customBlockState().literalObject(), UpdateFlags.UPDATE_CLIENTS);
+            LevelWriterProxy.INSTANCE.setBlock(level, pos, blockState.with(this.triggeredProperty, false).customBlockState().minecraftState(), UpdateFlags.UPDATE_CLIENTS);
         }
     }
 
