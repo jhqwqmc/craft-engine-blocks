@@ -7,7 +7,8 @@ import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.stream.Stream;
 
-public class FileUtils {
+public final class FileUtils {
+    private FileUtils() {}
 
     public static void deleteDirectory(Path folder) throws IOException {
         if (!Files.exists(folder)) return;

@@ -2,11 +2,9 @@ package cn.gtemc.craftengine.block.behavior;
 
 import cn.gtemc.craftengine.item.context.PlaceBlockBlockPlaceContext;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import net.momirealms.craftengine.bukkit.block.BukkitBlockManager;
 import net.momirealms.craftengine.bukkit.block.behavior.BukkitBlockBehavior;
 import net.momirealms.craftengine.bukkit.util.BlockStateUtils;
 import net.momirealms.craftengine.bukkit.util.DirectionUtils;
-import net.momirealms.craftengine.bukkit.util.KeyUtils;
 import net.momirealms.craftengine.core.block.BlockDefinition;
 import net.momirealms.craftengine.core.block.ImmutableBlockState;
 import net.momirealms.craftengine.core.block.UpdateFlags;
@@ -16,17 +14,12 @@ import net.momirealms.craftengine.core.util.Direction;
 import net.momirealms.craftengine.core.util.Key;
 import net.momirealms.craftengine.core.world.context.BlockPlaceContext;
 import net.momirealms.craftengine.proxy.minecraft.core.DirectionProxy;
-import net.momirealms.craftengine.proxy.minecraft.core.RegistryProxy;
-import net.momirealms.craftengine.proxy.minecraft.core.registries.BuiltInRegistriesProxy;
 import net.momirealms.craftengine.proxy.minecraft.world.level.LevelWriterProxy;
 import net.momirealms.craftengine.proxy.minecraft.world.level.ScheduledTickAccessProxy;
 import net.momirealms.craftengine.proxy.minecraft.world.level.SignalGetterProxy;
 import net.momirealms.craftengine.proxy.minecraft.world.level.block.state.BlockBehaviourProxy;
-import net.momirealms.craftengine.proxy.minecraft.world.level.block.state.BlockStateProxy;
 
-import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 public abstract class FacingTriggerableBlockBehavior extends BukkitBlockBehavior {
     protected static final Set<Key> DEFAULT_BLACKLIST_BLOCKS = ObjectOpenHashSet.of(
@@ -61,12 +54,12 @@ public abstract class FacingTriggerableBlockBehavior extends BukkitBlockBehavior
     }
 
     @Override
-    public void neighborChanged(Object thisBlock, Object[] args, Callable<Object> superMethod) {
+    public void neighborChanged(Object thisBlock, Object[] args) {
         Object state = args[0];
         Object level = args[1];
         Object pos = args[2];
         boolean hasNeighborSignal = SignalGetterProxy.INSTANCE.hasNeighborSignal(level, pos);
-        ImmutableBlockState blockState = BukkitBlockManager.instance().getImmutableBlockState(BlockStateUtils.blockStateToId(state));
+        ImmutableBlockState blockState = BlockStateUtils.getOptionalCustomBlockState(state).orElse(null);
         if (blockState == null || blockState.isEmpty()) return;
         boolean triggeredValue = blockState.get(this.triggeredProperty);
         if (hasNeighborSignal && !triggeredValue) {
@@ -96,13 +89,14 @@ public abstract class FacingTriggerableBlockBehavior extends BukkitBlockBehavior
     }
 
     protected boolean blockCheckByBlockState(Object blockState) {
+        if (this.blocks.isEmpty()) return !this.whitelistMode;
         if (blockState == null || BlockBehaviourProxy.BlockStateBaseProxy.INSTANCE.isAir(blockState)) {
             return false;
         }
-        Key blockId = Optional.ofNullable(BukkitBlockManager.instance().getImmutableBlockState(BlockStateUtils.blockStateToId(blockState)))
+        Key blockId = BlockStateUtils.getOptionalCustomBlockState(blockState)
                 .filter(state -> !state.isEmpty())
                 .map(state -> state.owner().value().id())
-                .orElseGet(() -> KeyUtils.identifierToKey(RegistryProxy.INSTANCE.getKey(BuiltInRegistriesProxy.BLOCK, BlockStateProxy.INSTANCE.getBlock(blockState))));
+                .orElseGet(() -> BlockStateUtils.getBlockOwnerIdFromState(blockState));
         return blockCheckByKey(blockId);
     }
 
@@ -111,6 +105,4 @@ public abstract class FacingTriggerableBlockBehavior extends BukkitBlockBehavior
     }
 
     protected abstract Object getTickPriority();
-
-    protected abstract void tick(Object state, Object level, Object pos);
 }

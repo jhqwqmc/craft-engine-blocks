@@ -25,7 +25,7 @@ public class RandomNumberContext extends PlayerOptionalContext {
 
     @NotNull
     public static RandomNumberContext of(@Nullable Player player, @NotNull Item item) {
-        return new RandomNumberContext(player, item, new ContextHolder(Map.of(DirectContextParameters.PLAYER, () -> player)));
+        return new RandomNumberContext(player, item, ContextHolder.mutable(Map.of(DirectContextParameters.PLAYER, () -> player)));
     }
 
     @SuppressWarnings("unchecked")

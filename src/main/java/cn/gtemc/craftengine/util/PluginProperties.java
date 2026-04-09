@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-public class PluginProperties {
+public final class PluginProperties {
     private final HashMap<String, String> propertyMap;
 
     private PluginProperties(HashMap<String, String> propertyMap) {
@@ -20,9 +20,10 @@ public class PluginProperties {
         return SingletonHolder.INSTANCE.propertyMap.get(key);
     }
 
-    private static class SingletonHolder {
-
+    private static final class SingletonHolder {
         private static final PluginProperties INSTANCE = getInstance();
+
+        private SingletonHolder() {}
 
         private static PluginProperties getInstance() {
             try (InputStream inputStream = PluginProperties.class.getClassLoader().getResourceAsStream("craft-engine-blocks.properties")) {

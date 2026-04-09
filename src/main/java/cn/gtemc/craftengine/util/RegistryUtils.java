@@ -21,7 +21,8 @@ import net.momirealms.craftengine.core.registry.WritableRegistry;
 import net.momirealms.craftengine.core.util.Key;
 import net.momirealms.craftengine.core.util.ResourceKey;
 
-public class RegistryUtils {
+public final class RegistryUtils {
+    private RegistryUtils() {}
 
     public static <T extends BlockBehavior> BlockBehaviorType<T> registerBlockBehavior(Key id, BlockBehaviorFactory<T> factory) {
         BlockBehaviorType<T> type = new BlockBehaviorType<>(id, factory);

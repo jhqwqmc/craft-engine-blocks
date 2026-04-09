@@ -1,7 +1,6 @@
 package cn.gtemc.craftengine.block.behavior;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import net.momirealms.craftengine.bukkit.block.BukkitBlockManager;
 import net.momirealms.craftengine.bukkit.util.BlockStateUtils;
 import net.momirealms.craftengine.bukkit.util.DirectionUtils;
 import net.momirealms.craftengine.core.block.BlockDefinition;
@@ -18,7 +17,6 @@ import net.momirealms.craftengine.proxy.minecraft.world.level.LevelWriterProxy;
 import net.momirealms.craftengine.proxy.minecraft.world.ticks.TickPriorityProxy;
 
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 public class PickaxeBlockBehavior extends FacingTriggerableBlockBehavior {
@@ -34,16 +32,11 @@ public class PickaxeBlockBehavior extends FacingTriggerableBlockBehavior {
     }
 
     @Override
-    public void tick(Object thisBlock, Object[] args, Callable<Object> superMethod) {
+    public void tick(Object thisBlock, Object[] args) {
         Object state = args[0];
         Object level = args[1];
         Object pos = args[2];
-        tick(state, level, pos);
-    }
-
-    @Override
-    public void tick(Object state, Object level, Object pos) {
-        ImmutableBlockState blockState = BukkitBlockManager.instance().getImmutableBlockState(BlockStateUtils.blockStateToId(state));
+        ImmutableBlockState blockState = BlockStateUtils.getOptionalCustomBlockState(state).orElse(null);
         if (blockState == null || blockState.isEmpty()) return;
         Object breakPos = BlockPosProxy.INSTANCE.relative(pos, DirectionUtils.toNMSDirection(blockState.get(this.facingProperty)));
         Object breakState = BlockGetterProxy.INSTANCE.getBlockState(level, breakPos);

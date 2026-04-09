@@ -6,7 +6,7 @@ import net.momirealms.craftengine.bukkit.plugin.user.BukkitServerPlayer;
 import net.momirealms.craftengine.core.block.BlockDefinition;
 import net.momirealms.craftengine.core.block.ImmutableBlockState;
 import net.momirealms.craftengine.core.block.behavior.BlockBehaviorFactory;
-import net.momirealms.craftengine.core.block.behavior.EntityBlockBehavior;
+import net.momirealms.craftengine.core.block.behavior.EntityBlock;
 import net.momirealms.craftengine.core.block.entity.BlockEntity;
 import net.momirealms.craftengine.core.block.entity.BlockEntityController;
 import net.momirealms.craftengine.core.entity.player.InteractionResult;
@@ -16,8 +16,7 @@ import net.momirealms.craftengine.core.world.CEWorld;
 import net.momirealms.craftengine.core.world.context.UseOnContext;
 import org.joml.Vector3f;
 
-@SuppressWarnings("UnstableApiUsage")
-public class SeatBlockBehavior extends BukkitBlockBehavior implements EntityBlockBehavior {
+public class SeatBlockBehavior extends BukkitBlockBehavior implements EntityBlock {
     public static final BlockBehaviorFactory<SeatBlockBehavior> FACTORY = new Factory();
     public final Vector3f offset;
     public final float yaw;
@@ -47,7 +46,7 @@ public class SeatBlockBehavior extends BukkitBlockBehavior implements EntityBloc
     }
 
     @Override
-    public BlockEntityController createController(BlockEntity blockEntity, int controllerId) {
+    public BlockEntityController createBlockEntityController(BlockEntity blockEntity, int controllerId) {
         this.controllerId = controllerId;
         return new SeatBlockEntityController(blockEntity, this);
     }
