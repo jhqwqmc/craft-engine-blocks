@@ -21,9 +21,6 @@ import net.momirealms.craftengine.core.plugin.config.ConfigValue;
 import net.momirealms.craftengine.core.util.Direction;
 import net.momirealms.craftengine.core.util.Key;
 import net.momirealms.craftengine.core.world.BlockHitResult;
-import net.momirealms.craftengine.libraries.reflection.clazz.SparrowClass;
-import net.momirealms.craftengine.libraries.reflection.method.SMethod0;
-import net.momirealms.craftengine.libraries.reflection.method.matcher.MethodMatcher;
 import net.momirealms.craftengine.proxy.minecraft.core.BlockPosProxy;
 import net.momirealms.craftengine.proxy.minecraft.world.*;
 import net.momirealms.craftengine.proxy.minecraft.world.entity.EntityProxy;
@@ -54,7 +51,6 @@ import java.util.stream.IntStream;
 
 public class PlaceBlockBehavior extends FacingTriggerableBlockBehavior {
     public static final BlockBehaviorFactory<PlaceBlockBehavior> FACTORY = new Factory();
-    private static final SMethod0 method$ItemEntity$getItem = SparrowClass.of(ItemEntityProxy.CLASS).getDeclaredSparrowMethod(MethodMatcher.named("getItem")).asm$0(); // todo 移动到ce项目的proxy模块
 
     public PlaceBlockBehavior(BlockDefinition blockDefinition, Property<Direction> facing, Property<Boolean> triggered, Set<Key> blocks, boolean whitelistMode) {
         super(blockDefinition, facing, triggered, blocks, whitelistMode);
@@ -86,7 +82,7 @@ public class PlaceBlockBehavior extends FacingTriggerableBlockBehavior {
         }
         Object itemEntity = getItemAt(level, blockPos);
         if (itemEntity == null) return false;
-        Object stack = method$ItemEntity$getItem.invoke(itemEntity);
+        Object stack = ItemEntityProxy.INSTANCE.getItem(itemEntity);
         if (ItemStackProxy.INSTANCE.isEmpty(stack)) return false;
         boolean result = function.apply(ItemStackProxy.INSTANCE.copyWithCount(stack, 1));
         if (!result) return true;
