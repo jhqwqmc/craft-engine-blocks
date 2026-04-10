@@ -182,11 +182,12 @@ public class PlaceBlockBehavior extends FacingTriggerableBlockBehavior {
     }
 
     private boolean tryPlaceCustomBlock(Object level, Object targetPos, Direction oppositeDirection, Object stack) {
-        List<ItemBehavior> behaviors = BukkitAdaptor.adapt(ItemStackUtils.getBukkitStack(stack)).getItemBehavior().orElse(null);
-        if (behaviors == null) return false;
-        for (ItemBehavior behavior : behaviors) {
-            if (!(behavior instanceof BlockItemBehavior blockItemBehavior)) continue;
-            if (!blockCheckByKey(blockItemBehavior.block())) continue;
+        ItemBehavior itemBehavior = BukkitAdaptor.adapt(ItemStackUtils.getBukkitStack(stack)).getBehavior().orElse(null);
+        if (itemBehavior == null) return false;
+        List<BlockItemBehavior> behaviors = new ArrayList<>();
+        itemBehavior.let(BlockItemBehavior.class, behaviors::add);
+        for (BlockItemBehavior behavior : behaviors) {
+            if (!blockCheckByKey(behavior.block())) continue;
             BlockHitResult hitResult = new BlockHitResult(
                     PositionUtils.toVec3d(targetPos),
                     oppositeDirection,
@@ -199,12 +200,12 @@ public class PlaceBlockBehavior extends FacingTriggerableBlockBehavior {
                     BukkitAdaptor.adapt(ItemStackUtils.getBukkitStack(stack)),
                     hitResult
             );
-            if (blockItemBehavior.place(context).success()) return true;
+            if (behavior.place(context).success()) return true;
         }
         return false;
     }
 
-    private void spawnItemEntity(Object level, Object targetPos, Object stack) {
+    private static void spawnItemEntity(Object level, Object targetPos, Object stack) {
         double itemHeightOffset = EntityTypeProxy.INSTANCE.getHeight(EntityTypeProxy.ITEM) / 2.0;
         double spawnX = BlockPosProxy.INSTANCE.getX(targetPos) + 0.5;
         double spawnY = BlockPosProxy.INSTANCE.getY(targetPos) + 0.5 - itemHeightOffset;

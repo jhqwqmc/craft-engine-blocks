@@ -7,7 +7,6 @@ import io.papermc.paper.event.entity.EntityEquipmentChangedEvent;
 import net.kyori.adventure.key.Key;
 import net.momirealms.craftengine.bukkit.api.BukkitAdaptor;
 import net.momirealms.craftengine.bukkit.item.BukkitItem;
-import net.momirealms.craftengine.bukkit.item.BukkitItemManager;
 import net.momirealms.craftengine.bukkit.plugin.user.BukkitServerPlayer;
 import net.momirealms.craftengine.bukkit.util.KeyUtils;
 import net.momirealms.craftengine.core.item.ItemDefinition;
@@ -45,8 +44,8 @@ public class ItemManager implements Manageable, Listener {
 
     @SuppressWarnings({"PatternValidation", "deprecation", "UnstableApiUsage"})
     private void removeAttributes(BukkitServerPlayer player, ItemStack itemStack, EquipmentSlot equipmentSlot) {
-        BukkitItem item = BukkitItemManager.instance().wrap(itemStack);
-        ItemDefinition itemDefinition = item.getCustomItem().orElse(null);
+        BukkitItem item = BukkitAdaptor.adapt(itemStack);
+        ItemDefinition itemDefinition = item.getDefinition().orElse(null);
         if (itemDefinition == null) {
             return;
         }
@@ -69,8 +68,8 @@ public class ItemManager implements Manageable, Listener {
 
     @SuppressWarnings({"PatternValidation", "deprecation", "UnstableApiUsage"})
     private void addAttributes(BukkitServerPlayer player, ItemStack itemStack, EquipmentSlot equipmentSlot) {
-        BukkitItem item = BukkitItemManager.instance().wrap(itemStack);
-        ItemDefinition itemDefinition = item.getCustomItem().orElse(null);
+        BukkitItem item = BukkitAdaptor.adapt(itemStack);
+        ItemDefinition itemDefinition = item.getDefinition().orElse(null);
         if (itemDefinition == null) {
             return;
         }

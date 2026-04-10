@@ -34,7 +34,7 @@ public final class GetArgumentsProcessor implements SimpleNetworkItemProcessor {
         RandomNumberContext randomNumberContext = RandomNumberContext.of(context.player(), item);
         if (this.attribute) {
             List<AttributeModifier> attributeModifiers = new ObjectArrayList<>();
-            ItemDefinition itemDefinition = item.getCustomItem().orElse(null);
+            ItemDefinition itemDefinition = item.getDefinition().orElse(null);
             if (itemDefinition != null) {
                 List<AttributesSetting.AttributeData> attributeDataList = itemDefinition.settings().getCustomData(AttributesSetting.ATTRIBUTES);
                 for (AttributesSetting.AttributeData attributeData : attributeDataList) {
