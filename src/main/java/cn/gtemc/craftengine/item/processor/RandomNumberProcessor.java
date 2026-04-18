@@ -2,10 +2,9 @@ package cn.gtemc.craftengine.item.processor;
 
 import cn.gtemc.craftengine.plugin.context.RandomNumberContext;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.momirealms.craftengine.bukkit.item.DataComponentTypes;
 import net.momirealms.craftengine.core.item.Item;
 import net.momirealms.craftengine.core.item.ItemBuildContext;
-import net.momirealms.craftengine.core.item.ItemProcessorFactory;
+import net.momirealms.craftengine.core.item.processor.ItemProcessorFactory;
 import net.momirealms.craftengine.core.item.processor.SimpleNetworkItemProcessor;
 import net.momirealms.craftengine.core.plugin.config.ConfigSection;
 import net.momirealms.craftengine.core.plugin.config.ConfigValue;
@@ -24,13 +23,11 @@ public final class RandomNumberProcessor implements SimpleNetworkItemProcessor {
 
     @Override
     public Item apply(Item item, ItemBuildContext context) {
-        CompoundTag customData = item.getSparrowNBTComponent(DataComponentTypes.CUSTOM_DATA) instanceof CompoundTag tag ? tag : new CompoundTag();
-        CompoundTag randomNumberData = customData.getCompound(RandomNumberContext.RANDOM_NUMBER_KEY, new CompoundTag());
+        CompoundTag randomNumberData = item.getSparrowTag(RandomNumberContext.RANDOM_NUMBER_KEY) instanceof CompoundTag tag ? tag : new CompoundTag();
         for (Map.Entry<String, NumberProvider> entry : this.numberProviders.entrySet()) {
             randomNumberData.putDouble(entry.getKey(), entry.getValue().getDouble(context));
         }
-        customData.put(RandomNumberContext.RANDOM_NUMBER_KEY, randomNumberData);
-        item.setNBTComponent(DataComponentTypes.CUSTOM_DATA, customData);
+        item.setSparrowTag(randomNumberData, RandomNumberContext.RANDOM_NUMBER_KEY);
         return item;
     }
 

@@ -1,11 +1,11 @@
 package cn.gtemc.craftengine.item.settings;
 
 import net.momirealms.craftengine.core.attribute.AttributeModifier;
-import net.momirealms.craftengine.core.item.CustomItemSettingType;
-import net.momirealms.craftengine.core.item.ItemSettings;
-import net.momirealms.craftengine.core.item.ItemSettingsModifier;
-import net.momirealms.craftengine.core.item.ItemSettingsModifierFactory;
 import net.momirealms.craftengine.core.item.processor.AttributeModifiersProcessor;
+import net.momirealms.craftengine.core.item.setting.CustomItemSettingType;
+import net.momirealms.craftengine.core.item.setting.ItemSettings;
+import net.momirealms.craftengine.core.item.setting.ItemSettingsModifier;
+import net.momirealms.craftengine.core.item.setting.ItemSettingsModifierFactory;
 import net.momirealms.craftengine.core.plugin.config.ConfigSection;
 import net.momirealms.craftengine.core.plugin.config.ConfigValue;
 import net.momirealms.craftengine.core.plugin.context.CommonConditions;

@@ -1,6 +1,5 @@
 package cn.gtemc.craftengine.plugin.context;
 
-import net.momirealms.craftengine.bukkit.item.DataComponentTypes;
 import net.momirealms.craftengine.core.entity.player.Player;
 import net.momirealms.craftengine.core.item.Item;
 import net.momirealms.craftengine.core.plugin.context.ContextHolder;
@@ -35,11 +34,7 @@ public class RandomNumberContext extends PlayerOptionalContext {
         if (!node.startsWith("random_number_")) {
             return super.getOptionalParameter(parameter);
         }
-        CompoundTag customData = this.item.getSparrowNBTComponent(DataComponentTypes.CUSTOM_DATA) instanceof CompoundTag tag ? tag : null;
-        if (customData == null) {
-            return super.getOptionalParameter(parameter);
-        }
-        CompoundTag randomNumberData = customData.getCompound(RANDOM_NUMBER_KEY);
+        CompoundTag randomNumberData = this.item.getSparrowTag(RANDOM_NUMBER_KEY) instanceof CompoundTag tag ? tag : null;
         if (randomNumberData == null) {
             return super.getOptionalParameter(parameter);
         }

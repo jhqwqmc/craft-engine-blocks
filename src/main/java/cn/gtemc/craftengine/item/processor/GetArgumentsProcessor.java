@@ -3,12 +3,11 @@ package cn.gtemc.craftengine.item.processor;
 import cn.gtemc.craftengine.item.settings.AttributesSetting;
 import cn.gtemc.craftengine.plugin.context.RandomNumberContext;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.momirealms.craftengine.bukkit.item.DataComponentTypes;
 import net.momirealms.craftengine.core.attribute.AttributeModifier;
 import net.momirealms.craftengine.core.item.Item;
 import net.momirealms.craftengine.core.item.ItemBuildContext;
 import net.momirealms.craftengine.core.item.ItemDefinition;
-import net.momirealms.craftengine.core.item.ItemProcessorFactory;
+import net.momirealms.craftengine.core.item.processor.ItemProcessorFactory;
 import net.momirealms.craftengine.core.item.processor.SimpleNetworkItemProcessor;
 import net.momirealms.craftengine.core.plugin.config.ConfigSection;
 import net.momirealms.craftengine.core.plugin.config.ConfigValue;
@@ -40,11 +39,10 @@ public final class GetArgumentsProcessor implements SimpleNetworkItemProcessor {
                 for (AttributesSetting.AttributeData attributeData : attributeDataList) {
                     if (attributeData.expires() != null && attributeData.expires().before(new Date())) continue; // 过期不管
                     if (attributeData.conditions() != null && !attributeData.conditions().test(randomNumberContext)) continue; // 不符合条件不管
-                    CompoundTag customData = item.getSparrowNBTComponent(DataComponentTypes.CUSTOM_DATA) instanceof CompoundTag tag ? tag : null;
-                    if (customData == null) {
+                    CompoundTag randomNumberData = item.getSparrowTag(RandomNumberContext.RANDOM_NUMBER_KEY) instanceof CompoundTag tag ? tag : null;
+                    if (randomNumberData == null) {
                         continue;
                     }
-                    CompoundTag randomNumberData = customData.getCompound(RandomNumberContext.RANDOM_NUMBER_KEY);
                     for (Map.Entry<String, Tag> entry : randomNumberData.entrySet()) {
                         if (entry.getValue() instanceof DoubleTag tag) {
                             context.contexts().withParameter(ContextKey.direct("random_number_" + entry.getKey()), tag.value());

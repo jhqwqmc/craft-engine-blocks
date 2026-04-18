@@ -46,9 +46,13 @@ public class SeatBlockBehavior extends BukkitBlockBehavior implements EntityBloc
     }
 
     @Override
-    public BlockEntityController createBlockEntityController(BlockEntity blockEntity, int controllerId) {
-        this.controllerId = controllerId;
+    public BlockEntityController createBlockEntityController(BlockEntity blockEntity) {
         return new SeatBlockEntityController(blockEntity, this);
+    }
+
+    @Override
+    public void initControllerId(int id) {
+        this.controllerId = id;
     }
 
     private static class Factory implements BlockBehaviorFactory<SeatBlockBehavior> {
