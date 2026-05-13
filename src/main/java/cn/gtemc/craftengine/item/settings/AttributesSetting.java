@@ -49,7 +49,7 @@ public class AttributesSetting implements ItemSettingsModifier {
                 NumberProvider amount = section.getNonNullNumber("amount");
                 AttributeModifier.Operation operation = section.getNonNullEnum("operation", AttributeModifier.Operation.class);
                 AttributeModifiersProcessor.PreModifier.PreDisplay display = null;
-                if (VersionHelper.isOrAbove1_21_6() && section.containsKey("display")) {
+                if (VersionHelper.isOrAbove1_21_6 && section.containsKey("display")) {
                     ConfigSection displayConfig = section.getNonNullSection("display");
                     AttributeModifier.Display.Type displayType = displayConfig.getNonNullEnum("type", AttributeModifier.Display.Type.class);
                     if (displayType == AttributeModifier.Display.Type.OVERRIDE) {

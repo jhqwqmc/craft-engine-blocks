@@ -67,11 +67,11 @@ public class SeatBlockEntityController extends BlockEntityController {
         Location location = calculateSeatLocation(new Location(player.getWorld(), super.blockEntity.pos.x() + 0.5, super.blockEntity.pos.y(), super.blockEntity.pos.z() + 0.5, 0, 0));
         Entity seatEntity = this.behavior.limitPlayerRotation ?
                 EntityUtils.spawnEntity(player.getWorld(),
-                        VersionHelper.isOrAbove1_20_2() ? location.subtract(0, 0.9875, 0) : location.subtract(0, 0.990625, 0),
+                        VersionHelper.isOrAbove1_20_2 ? location.subtract(0, 0.9875, 0) : location.subtract(0, 0.990625, 0),
                         EntityType.ARMOR_STAND,
                         entity -> {
                             ArmorStand armorStand = (ArmorStand) entity;
-                            if (VersionHelper.isOrAbove1_21_3()) {
+                            if (VersionHelper.isOrAbove1_21_3) {
                                 Objects.requireNonNull(armorStand.getAttribute(Attribute.MAX_HEALTH)).setBaseValue(0.01);
                             } else {
                                 LegacyAttributeUtils.setMaxHealth(armorStand);
@@ -88,7 +88,7 @@ public class SeatBlockEntityController extends BlockEntityController {
                             armorStand.getPersistentDataContainer().set(SEAT_KEY, PersistentDataType.BOOLEAN, true);
                         }) :
                 EntityUtils.spawnEntity(player.getWorld(),
-                        VersionHelper.isOrAbove1_20_2() ? location : location.subtract(0, 0.25, 0),
+                        VersionHelper.isOrAbove1_20_2 ? location : location.subtract(0, 0.25, 0),
                         EntityType.ITEM_DISPLAY,
                         entity -> {
                             ItemDisplay itemDisplay = (ItemDisplay) entity;

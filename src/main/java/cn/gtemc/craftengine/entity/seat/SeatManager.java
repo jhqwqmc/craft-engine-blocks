@@ -27,7 +27,7 @@ public class SeatManager implements Manageable, Listener {
 
     public SeatManager(CraftEngineBlocks plugin) {
         this.plugin = plugin;
-        this.dismountListener = VersionHelper.isOrAbove1_20_3()
+        this.dismountListener = VersionHelper.isOrAbove1_20_3
                 ? new DismountListener1_20_3(this::handleDismount)
                 : new DismountListener1_20(this::handleDismount);
     }
